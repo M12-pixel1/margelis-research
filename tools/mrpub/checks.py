@@ -497,10 +497,19 @@ class NoteChecks:
             return FAIL, f"{tag} exists on origin but not locally; run `git fetch --tags` and re-check"
         released = git("show", f"{tag}:research/{n.number}/SHA256SUMS", check=False)
         current = n.sums_path.read_text(encoding="utf-8").strip()
-        if released.strip() != current:
-            return FAIL, (f"{tag} is released and its artifacts differ from the working tree. "
+        changed = [name for name, digest in parse_sums(n.sums_path).items()
+                   if sha256_file(n.dir / name) != digest]
+        released_digests = {}
+        for line in released.splitlines():
+            if line.strip():
+                digest, name = line.split(maxsplit=1)
+                released_digests[name.strip()] = digest
+        changed += [name for name, digest in released_digests.items()
+                    if not (n.dir / name).exists() or sha256_file(n.dir / name) != digest]
+        if released.strip() != current or changed:
+            return FAIL, (f"{tag} is released and the working tree differs from it ({sorted(set(changed)) or 'SHA256SUMS'}). "
                           f"Published versions are never overwritten: add a new version to note.yaml.")
-        return PASS, f"{tag} released; working-tree artifacts are identical to the release"
+        return PASS, f"{tag} released; working-tree files are byte-identical to the released digests"
 
     def _published_files(self) -> list[Path]:
         n = self.note

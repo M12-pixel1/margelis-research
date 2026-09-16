@@ -1,6 +1,6 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-16T16:59:09Z",
+  "generated_at": "2026-09-16T17:05:52Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.0",
@@ -8,55 +8,98 @@
   "status": "PARTIAL",
   "repository": {
     "url": "https://github.com/M12-pixel1/margelis-research",
-    "exists": false,
-    "visibility": null,
-    "default_branch": null,
-    "immutable_releases_enabled": null,
-    "error": "gh: Not Found (HTTP 404)"
+    "exists": true,
+    "visibility": "public",
+    "default_branch": "main",
+    "immutable_releases_enabled": true,
+    "error": null
   },
-  "commit_sha": null,
+  "commit_sha": "200103f8e3e64e609140d543f5988a363a76683d",
   "release": {
     "tag": "research-note-001-v1.0",
-    "exists": false,
-    "error": "gh: Not Found (HTTP 404)"
+    "exists": true,
+    "id": 390114628,
+    "url": "https://github.com/M12-pixel1/margelis-research/releases/tag/research-note-001-v1.0",
+    "name": "Margelis Research Note 001 — From Mandate to Verified Outcome",
+    "draft": false,
+    "immutable": true,
+    "published_at": "2026-09-16T17:04:13Z",
+    "target_commit": "200103f8e3e64e609140d543f5988a363a76683d",
+    "assets": [
+      {
+        "name": "Margelis_Research_Note_001.md",
+        "size": 11814,
+        "download_status": 200,
+        "sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
+        "github_digest": "sha256:c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
+        "matches_sha256sums": true
+      },
+      {
+        "name": "Margelis_Research_Note_001.pdf",
+        "size": 251688,
+        "download_status": 200,
+        "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+        "github_digest": "sha256:7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+        "matches_sha256sums": true
+      },
+      {
+        "name": "metadata.json",
+        "size": 7600,
+        "download_status": 200,
+        "sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
+        "github_digest": "sha256:2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
+        "matches_sha256sums": true
+      },
+      {
+        "name": "SHA256SUMS",
+        "size": 273,
+        "download_status": 200,
+        "sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0",
+        "github_digest": "sha256:cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0",
+        "matches_sha256sums": true
+      }
+    ],
+    "all_assets_present_and_matching": true
   },
   "canonical_website": {
     "url": "https://rupestelisholding.com/research/001/",
     "status": "NOT_DEPLOYED",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-16T16:59:08Z",
+      "checked_at": "2026-09-16T17:05:51Z",
       "http_status": 404,
       "content_type": null
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T16:59:08Z",
+      "checked_at": "2026-09-16T17:05:52Z",
       "http_status": 404,
       "content_type": null
     }
   },
   "preview_website": {
     "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-    "pages_site": null,
+    "pages_site": "https://m12-pixel1.github.io/margelis-research/",
     "pages_status": null,
-    "pages_error": "gh: Not Found (HTTP 404)",
-    "deployment_id": null,
-    "deployment_commit": null,
-    "deployment_state": null,
+    "pages_error": null,
+    "deployment_id": 6486190265,
+    "deployment_commit": "9e5481172170fc0af9aef7f93e1287702fd986ab",
+    "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-16T16:59:07Z",
-      "http_status": 404,
+      "checked_at": "2026-09-16T17:05:50Z",
+      "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T16:59:07Z",
-      "http_status": 404,
-      "content_type": "text/html; charset=utf-8"
+      "checked_at": "2026-09-16T17:05:50Z",
+      "http_status": 200,
+      "content_type": "application/pdf",
+      "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+      "sha256_matches": true
     },
-    "verified": false
+    "verified": true
   },
   "hashes": {
     "pdf_sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -71,7 +114,7 @@
     "reason": "no deposition has been created (ZENODO_ACCESS_TOKEN not provided)"
   },
   "doi": null,
-  "publication_timestamp": null,
+  "publication_timestamp": "2026-09-16T17:04:13Z",
   "license": {
     "status": "pending",
     "spdx": null,
@@ -188,7 +231,7 @@
       {
         "id": "note001.versioning",
         "status": "PASS",
-        "detail": "research-note-001-v1.0 not released yet; artifacts may still change"
+        "detail": "research-note-001-v1.0 released; working-tree files are byte-identical to the released digests"
       },
       {
         "id": "note001.published_claims",
