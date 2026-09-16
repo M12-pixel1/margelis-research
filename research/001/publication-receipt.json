@@ -1,6 +1,6 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-16T17:21:15Z",
+  "generated_at": "2026-09-16T23:54:42Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.0",
@@ -11,7 +11,7 @@
     "exists": true,
     "visibility": "public",
     "default_branch": "main",
-    "immutable_releases_enabled": true,
+    "immutable_releases_enabled": null,
     "error": null
   },
   "commit_sha": "200103f8e3e64e609140d543f5988a363a76683d",
@@ -66,13 +66,13 @@
     "status": "LIVE",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-16T17:21:14Z",
+      "checked_at": "2026-09-16T23:54:40Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T17:21:14Z",
+      "checked_at": "2026-09-16T23:54:41Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -81,21 +81,21 @@
   },
   "preview_website": {
     "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-    "pages_site": "https://m12-pixel1.github.io/margelis-research/",
+    "pages_site": null,
     "pages_status": null,
-    "pages_error": null,
+    "pages_error": "gh: Access to this GitHub API path is not permitted through this proxy. (HTTP 403)",
     "deployment_id": 6486190265,
     "deployment_commit": "9e5481172170fc0af9aef7f93e1287702fd986ab",
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-16T17:21:12Z",
+      "checked_at": "2026-09-16T23:54:39Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T17:21:13Z",
+      "checked_at": "2026-09-16T23:54:39Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -118,15 +118,15 @@
   "doi": null,
   "publication_timestamp": "2026-09-16T17:04:13Z",
   "license": {
-    "status": "pending",
-    "spdx": null,
+    "status": "granted",
+    "spdx": "CC-BY-4.0",
     "proposed": "CC-BY-4.0"
   },
   "validation": {
     "summary": {
-      "PASS": 29,
+      "PASS": 28,
       "FAIL": 0,
-      "WARN": 0,
+      "WARN": 1,
       "SKIP": 0
     },
     "results": [
@@ -162,8 +162,8 @@
       },
       {
         "id": "note001.github_render",
-        "status": "PASS",
-        "detail": "GitHub renders tables=1, rows=11/11, h2=11/11"
+        "status": "WARN",
+        "detail": "GitHub Markdown API HTTP 403"
       },
       {
         "id": "note001.external_links",
@@ -183,7 +183,7 @@
       {
         "id": "note001.metadata_consistency",
         "status": "PASS",
-        "detail": "metadata.json matches note.yaml, references.json and file digests"
+        "detail": "metadata.json matches note.yaml, references.json and file digests (license as recorded at release)"
       },
       {
         "id": "note001.pdf_opens",
@@ -228,7 +228,7 @@
       {
         "id": "note001.license_consistency",
         "status": "PASS",
-        "detail": "license pending consistently in all files"
+        "detail": "license granted (CC-BY-4.0) consistently in all files"
       },
       {
         "id": "note001.versioning",
@@ -282,11 +282,6 @@
       "item": "zenodo_doi",
       "state": "NOT_STARTED",
       "cause": "No Zenodo access token has been provided."
-    },
-    {
-      "item": "license",
-      "state": "PENDING",
-      "cause": "No license has been granted for the note text; an open-access archive record requires one."
     }
   ]
 }
