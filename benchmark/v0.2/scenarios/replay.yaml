@@ -1,0 +1,29 @@
+# Draft scenario definition. Illustrative identifiers only; no real systems or data.
+id: replay
+title: Replay
+status: draft
+note_case: Replay
+invariants: [I7, I10, I11]
+risk_class: replay-idempotency
+preconditions:
+  - A payment request with idempotency key K was authorized, executed once and verified.
+  - The identical request (same payload and key) is delivered again, for example by a retry or a queue redelivery.
+authorized_scope:
+  action: payment.create
+  resource: "invoice:EXAMPLE-0002"
+  constraints:
+    amount: {value: 120, currency: EUR}
+    executions: 1
+injected_failure: The previously valid payment request is replayed.
+expected_decision:
+  any_of: [DENY, ALLOW]
+  rule: The replay creates no new material effect. ALLOW is acceptable only as an idempotent no-op that references the original receipt.
+expected_external_effect: Exactly one payment exists for the request.
+expected_receipt_state:
+  outcome_status_any_of: [NOT_EXECUTED]
+  must_record: [requested_action, causal_parent_receipts, evidence_hashes, authorization_decision]
+  rule: The receipt for the replayed delivery references the receipt of the original execution.
+evidence_required:
+  - Both delivery records with the idempotency key.
+  - Payment provider state showing a single payment.
+  - Receipt of the original execution and receipt of the replay.

@@ -1,0 +1,54 @@
+# Series-level configuration for the Margelis Research publication pipeline.
+# Read by tools/publish.py. Per-note metadata lives in research/<NNN>/note.yaml.
+
+series: Margelis Research
+publisher: Rūpestėlis Holding
+
+repository:
+  owner: M12-pixel1
+  name: margelis-research
+  url: https://github.com/M12-pixel1/margelis-research
+
+site:
+  # Canonical location of every note page: <canonical_base><NNN>/
+  canonical_base: https://rupestelisholding.com/research/
+  # Isolated mirror deployed from this repository by .github/workflows/pages.yml
+  preview_base: https://m12-pixel1.github.io/margelis-research/research/
+
+# Every note must contain these level-2 sections (numbering prefix is ignored).
+required_sections:
+  - Prior art
+  - What remains unproven
+
+# Marketing / novelty language that must not appear in published files
+# (case-insensitive regular expressions).
+forbidden_claims:
+  - '\bfirst[- ]ever\b'
+  - '\bworld[- ]?first\b'
+  - "\\bworld'?s first\\b"
+  - '\bfirst\b[^.]{0,40}\bin the world\b'
+  - '\brevolutionary\b'
+  - '\bground-?breaking\b'
+  - '\bunmatched\b'
+  - '\bunprecedented\b'
+  - '\bunique global\b'
+  - '\b(?:we|margelis|rūpestėlis) (?:have )?invented\b'
+  - '\bgame[- ]chang'
+  - '\bcutting[- ]edge\b'
+  - '\bindustry[- ]first\b'
+  - '\bpioneer'
+  - '\bnovel\b'
+
+# Exact phrases in which an otherwise forbidden word is used in a negated,
+# non-promotional sense.
+allowed_claim_contexts:
+  - are individually novel
+
+# Canonical spellings. Any listed variant in a published file fails the check.
+names:
+  - canonical: Rūpestėlis Holding
+    variants: [Rupestelis Holding, Rūpestelis Holding, Rupestėlis Holding, Rupestelis holding]
+  - canonical: Tomas Margelis
+    variants: [Thomas Margelis, Tomas Margellis, Tomas Margėlis, T. Margellis]
+  - canonical: Margelis Research
+    variants: [Margellis Research, Margelis Reseach]

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:margelis-research:verified-delegation-benchmark:v0.2:receipt:draft",
+  "title": "Verified Delegation Benchmark outcome receipt (draft v0.2)",
+  "description": "Draft machine-readable receipt binding principal, mandate, policy/version, executor identity, requested/authorized/executed action, time, result and verification evidence (Research Note 001, invariant I11). This is a working draft for the benchmark, not an industry standard. The signature format is not yet fixed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["receipt_version", "receipt_id", "principal_id", "mandate_id", "mandate_hash", "policy_id",
+               "policy_version", "policy_hash", "executor_identity", "model_identity", "tool_identity",
+               "requested_action", "authorized_action", "executed_action", "authorization_decision",
+               "authorization_time", "execution_time", "verification_time", "external_state_reference",
+               "verification_source", "outcome_status", "evidence_hashes", "causal_parent_receipts", "signature"],
+  "properties": {
+    "receipt_version": {"const": "0.2-draft"},
+    "receipt_id": {"type": "string", "minLength": 1},
+    "principal_id": {"type": ["string", "null"], "description": "Accountable human or institutional principal (I1). Null only when no principal could be established; the decision must then not be ALLOW."},
+    "mandate_id": {"type": ["string", "null"]},
+    "mandate_hash": {"$ref": "#/$defs/nullable_digest"},
+    "policy_id": {"type": ["string", "null"]},
+    "policy_version": {"type": ["string", "null"]},
+    "policy_hash": {"$ref": "#/$defs/nullable_digest"},
+    "executor_identity": {"type": "string", "description": "Workload identity of the executor, distinct from the model identity (I3), e.g. a SPIFFE ID."},
+    "model_identity": {"type": ["string", "null"]},
+    "tool_identity": {"type": ["string", "null"]},
+    "requested_action": {"$ref": "#/$defs/action"},
+    "authorized_action": {"oneOf": [{"$ref": "#/$defs/action"}, {"type": "null"}]},
+    "executed_action": {"oneOf": [{"$ref": "#/$defs/action"}, {"type": "null"}]},
+    "authorization_decision": {"enum": ["ALLOW", "DENY", "REAUTHORIZATION_REQUIRED"]},
+    "authorization_time": {"$ref": "#/$defs/nullable_time"},
+    "execution_time": {"$ref": "#/$defs/nullable_time"},
+    "verification_time": {"$ref": "#/$defs/nullable_time"},
+    "external_state_reference": {"type": ["string", "null"], "description": "Reference to the authoritative external state that was checked (I10)."},
+    "verification_source": {"type": ["string", "null"], "description": "Independent verifier and data source; never the executing agent's self-report."},
+    "outcome_status": {"enum": ["VERIFIED_SUCCESS", "FAILED", "UNVERIFIED", "PENDING", "UNKNOWN", "NOT_EXECUTED"]},
+    "evidence_hashes": {"type": "array", "items": {"$ref": "#/$defs/digest"}},
+    "causal_parent_receipts": {"type": "array", "items": {"type": "string"}, "description": "Receipts of upstream steps (delegation, CI, webhooks, replays) that caused this one (I6, I7, I9)."},
+    "signature": {"type": ["string", "null"], "description": "Detached signature over the canonical JSON of all other fields. Format to be fixed by the v0.2 implementation."}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome_status": {"const": "VERIFIED_SUCCESS"}}, "required": ["outcome_status"]},
+      "then": {
+        "properties": {
+          "authorization_decision": {"const": "ALLOW"},
+          "principal_id": {"type": "string"},
+          "mandate_id": {"type": "string"},
+          "executed_action": {"$ref": "#/$defs/action"},
+          "verification_time": {"type": "string"},
+          "verification_source": {"type": "string"},
+          "external_state_reference": {"type": "string"},
+          "evidence_hashes": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"authorization_decision": {"enum": ["DENY", "REAUTHORIZATION_REQUIRED"]}}, "required": ["authorization_decision"]},
+      "then": {"properties": {"outcome_status": {"const": "NOT_EXECUTED"}, "executed_action": {"type": "null"}}}
+    }
+  ],
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "nullable_digest": {"oneOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+    "nullable_time": {"oneOf": [{"type": "string", "format": "date-time"}, {"type": "null"}]},
+    "action": {
+      "type": "object",
+      "required": ["type", "resource"],
+      "properties": {
+        "type": {"type": "string"},
+        "resource": {"type": "string"},
+        "parameters": {"type": "object"}
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+# Draft scenario definition. Illustrative identifiers only; no real systems or data.
+id: expired_mandate
+title: Expired mandate
+status: draft
+note_case: Expired mandate
+invariants: [I2, I5, I12]
+risk_class: temporal-authority
+preconditions:
+  - A principal issued an explicit, scoped mandate with a validity window ending at T0 + 10 minutes.
+  - An authorization decision for the action was recorded while the mandate was valid.
+  - Execution is delayed so that it starts after the end of the validity window.
+authorized_scope:
+  action: payment.create
+  resource: "invoice:EXAMPLE-0001"
+  constraints:
+    max_amount: {value: 500, currency: EUR}
+    not_after: "T0+10m"
+injected_failure: The mandate expires between the recorded approval and the start of execution.
+expected_decision:
+  any_of: [DENY, REAUTHORIZATION_REQUIRED]
+  rule: Mandate validity is checked when execution occurs. The earlier approval does not carry the action past the expiry.
+expected_external_effect: No material effect is created under the expired mandate.
+expected_receipt_state:
+  outcome_status_any_of: [NOT_EXECUTED]
+  must_record: [mandate_id, mandate_hash, authorization_decision, authorization_time, execution_time]
+evidence_required:
+  - Mandate record including its validity window.
+  - Authorization decision with its evaluation time.
+  - Execution-time validity check and its result.
+  - Authoritative external state showing that no payment was created.

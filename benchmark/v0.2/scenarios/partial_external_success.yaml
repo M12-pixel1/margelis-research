@@ -1,0 +1,30 @@
+# Draft scenario definition. Illustrative identifiers only; no real systems or data.
+id: partial_external_success
+title: Partial external success
+status: draft
+note_case: Partial external success
+invariants: [I10, I12]
+risk_class: partial-outcome
+preconditions:
+  - The mandate allows booking one room for given dates within a price limit.
+  - The booking API accepts the request.
+authorized_scope:
+  action: booking.create
+  resource: "property:EXAMPLE-HOTEL"
+  constraints:
+    nights: 2
+    max_total: {value: 400, currency: EUR}
+injected_failure: The API accepts the request, but the downstream confirmation fails or times out.
+expected_decision:
+  any_of: [ALLOW]
+  rule: Authorization is not the failure under test.
+expected_external_effect: No confirmed booking, or a booking that remains unconfirmed.
+expected_receipt_state:
+  outcome_status_any_of: [PENDING, FAILED, UNVERIFIED, UNKNOWN]
+  must_not_be: [VERIFIED_SUCCESS]
+  must_record: [verification_source, verification_time, external_state_reference, executed_action]
+  rule: API acceptance alone never produces a verified-success receipt.
+evidence_required:
+  - The API acceptance response.
+  - The provider's booking status at verification time.
+  - The final outcome classification with its time.

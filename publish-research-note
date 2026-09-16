@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Build and check a Margelis Research Note; stops before any publication step.
+#   ./publish-research-note 002
+# Windows: python tools/publish.py all 002
+set -euo pipefail
+cd "$(dirname "$0")"
+if [ $# -ne 1 ]; then
+  echo "usage: $0 <note number, e.g. 002>" >&2
+  exit 2
+fi
+exec python tools/publish.py all "$1"

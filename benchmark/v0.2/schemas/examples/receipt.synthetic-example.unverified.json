@@ -1,0 +1,41 @@
+{
+  "receipt_version": "0.2-draft",
+  "receipt_id": "synthetic-example-false-done-0001",
+  "principal_id": "principal:example-customer-service-lead",
+  "mandate_id": "mandate:EXAMPLE-M-0009",
+  "mandate_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000011",
+  "policy_id": "policy:example-orders",
+  "policy_version": "3",
+  "policy_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000012",
+  "executor_identity": "spiffe://example.test/agent/orders-executor",
+  "model_identity": "model:example-model-b",
+  "tool_identity": "tool:example-orders-api",
+  "requested_action": {
+    "type": "order.update_delivery_address",
+    "resource": "order:EXAMPLE-ORD-9",
+    "parameters": {"address_ref": "address:EXAMPLE-ADDR-2"}
+  },
+  "authorized_action": {
+    "type": "order.update_delivery_address",
+    "resource": "order:EXAMPLE-ORD-9",
+    "parameters": {"address_ref": "address:EXAMPLE-ADDR-2"}
+  },
+  "executed_action": {
+    "type": "order.update_delivery_address",
+    "resource": "order:EXAMPLE-ORD-9",
+    "parameters": {"address_ref": "address:EXAMPLE-ADDR-2"}
+  },
+  "authorization_decision": "ALLOW",
+  "authorization_time": "2026-01-01T11:00:00Z",
+  "execution_time": "2026-01-01T11:00:02Z",
+  "verification_time": "2026-01-01T11:00:30Z",
+  "external_state_reference": "example-orders-db:order:EXAMPLE-ORD-9:delivery_address",
+  "verification_source": "verifier:example-independent-reader",
+  "outcome_status": "UNVERIFIED",
+  "evidence_hashes": [
+    "sha256:0000000000000000000000000000000000000000000000000000000000000013",
+    "sha256:0000000000000000000000000000000000000000000000000000000000000014"
+  ],
+  "causal_parent_receipts": [],
+  "signature": null
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:margelis-research:verified-delegation-benchmark:v0.2:scenario:draft",
+  "title": "Verified Delegation Benchmark scenario definition (draft v0.2)",
+  "description": "Draft format for adversarial scenario definitions. Not an industry standard.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "status", "note_case", "invariants", "risk_class", "preconditions",
+               "authorized_scope", "injected_failure", "expected_decision", "expected_external_effect",
+               "expected_receipt_state", "evidence_required"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "title": {"type": "string"},
+    "status": {"const": "draft"},
+    "note_case": {"type": "string", "description": "Case name in Research Note 001, section 4."},
+    "invariants": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^I(?:[1-9]|1[0-2])$"}
+    },
+    "risk_class": {
+      "enum": ["temporal-authority", "policy-continuity", "substitution", "replay-idempotency", "delegation",
+               "memory-authority", "indirect-execution", "outcome-verification", "partial-outcome",
+               "identity-binding"]
+    },
+    "preconditions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "authorized_scope": {
+      "type": "object",
+      "required": ["action", "resource"],
+      "properties": {
+        "action": {"type": "string"},
+        "resource": {"type": "string"},
+        "constraints": {"type": "object"}
+      }
+    },
+    "injected_failure": {"type": "string"},
+    "expected_decision": {
+      "type": "object", "additionalProperties": false, "required": ["any_of", "rule"],
+      "properties": {
+        "any_of": {"type": "array", "minItems": 1, "uniqueItems": true,
+                   "items": {"enum": ["ALLOW", "DENY", "REAUTHORIZATION_REQUIRED"]}},
+        "rule": {"type": "string"}
+      }
+    },
+    "expected_external_effect": {"type": "string"},
+    "expected_receipt_state": {
+      "type": "object", "additionalProperties": false, "required": ["outcome_status_any_of", "must_record"],
+      "properties": {
+        "outcome_status_any_of": {"type": "array", "minItems": 1, "uniqueItems": true,
+                                  "items": {"$ref": "#/$defs/outcome_status"}},
+        "must_not_be": {"type": "array", "items": {"$ref": "#/$defs/outcome_status"}},
+        "must_record": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "rule": {"type": "string"}
+      }
+    },
+    "evidence_required": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  },
+  "$defs": {
+    "outcome_status": {"enum": ["VERIFIED_SUCCESS", "FAILED", "UNVERIFIED", "PENDING", "UNKNOWN", "NOT_EXECUTED"]}
+  }
+}

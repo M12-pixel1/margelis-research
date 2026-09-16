@@ -1,0 +1,5 @@
+# Published digests depend on exact bytes: always LF in the repository and in checkouts.
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.ttf binary

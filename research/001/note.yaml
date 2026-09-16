@@ -1,0 +1,93 @@
+# Input metadata for Margelis Research Note 001.
+# This is the only hand-edited metadata file for the note. metadata.json,
+# SHA256SUMS, CITATION.cff and the web pages are generated from it by
+# `python tools/publish.py build 001`.
+#
+# Changing any released field (text, title, date, ...) requires a new
+# version entry below; the pipeline refuses to overwrite a released version.
+
+number: "001"
+version: "1.0"
+date: "2026-09-16"
+
+title: From Mandate to Verified Outcome
+subtitle: An Evaluation Framework for Autonomous Agent Execution
+
+authors:
+  - given_name: Tomas
+    family_name: Margelis
+    affiliation: Rūpestėlis Holding
+    orcid: null
+
+language: en
+publication_type: research note
+status: Concept + Evaluation Framework
+
+zenodo:
+  upload_type: publication
+  publication_type: technicalnote
+
+abstract: >-
+  A technical evaluation framework for testing whether consequential
+  autonomous-agent execution remains continuously bound to an accountable
+  human or institutional mandate through runtime authorization, execution,
+  external state change, independent verification and outcome receipt.
+
+# Archive / citation keywords (Zenodo, CITATION.cff).
+keywords:
+  - AI agents
+  - AI governance
+  - autonomous agents
+  - delegated authority
+  - authorization
+  - verified outcomes
+  - agent security
+  - enterprise AI
+  - AI reliability
+  - benchmarking
+
+# Web page keywords (meta tags only).
+web_keywords:
+  - AI agent governance
+  - autonomous agents
+  - delegated authority
+  - AI authorization
+  - agent security
+  - AI agent benchmark
+  - verified outcomes
+  - authority continuity
+  - runtime authorization
+  - workload identity
+  - enterprise AI governance
+
+license:
+  # pending -> no license has been granted; the pipeline refuses to publish
+  # an open-access Zenodo record and writes no license into citation files.
+  # To grant: set status: granted, spdx: CC-BY-4.0, authorized_by, authorized_on.
+  status: pending
+  spdx: null
+  proposed: CC-BY-4.0
+  scope: >-
+    Research Note text only (the Markdown and PDF files of this note). It does
+    not apply to production code, Tutela, Authority Plane, Revenue OS,
+    proprietary enforcement logic, internal datasets, private benchmarks,
+    customer data or confidential architectures.
+  authorized_by: null
+  authorized_on: null
+
+# Statements that must appear verbatim inside the named section.
+locked_statements:
+  What remains unproven:
+    - The framework has not yet been validated across a broad public corpus of production agent systems.
+    - Metric thresholds are not industry standards.
+    - Cryptographic receipts do not prove external truth unless the verification source is trustworthy.
+    - Legal authority remains jurisdiction- and institution-specific.
+    - Technical enforcement can encode authority but cannot create lawful authority.
+    - The public benchmark still needs reproducible fixtures, baseline systems, failure injection and raw result evidence.
+  Status:
+    - This note does not claim that authority continuity, delegation receipts, runtime authorization, or outcome binding are individually novel.
+
+version_history:
+  - version: "1.0"
+    date: "2026-09-16"
+    summary: Initial publication.

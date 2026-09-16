@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:margelis-research:schema:note-metadata:1",
+  "title": "Margelis Research release manifest (research/<NNN>/metadata.json)",
+  "description": "Immutable per version. Identifiers assigned after release (e.g. a DOI) are recorded in publication-receipt.json and CITATION.cff, not here.",
+  "type": "object",
+  "required": ["schema", "id", "series", "number", "version", "release_tag", "title", "short_title", "subtitle",
+               "authors", "publisher", "publication_date", "language", "publication_type", "archive_resource_type",
+               "status", "abstract", "keywords", "license", "canonical_url", "repository_url", "release_url",
+               "persistent_identifiers", "files", "build", "references", "version_history"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": "margelis-research/note-metadata/1"},
+    "id": {"type": "string", "pattern": "^margelis-research-note-[0-9]{3}$"},
+    "series": {"type": "string"},
+    "number": {"type": "string", "pattern": "^[0-9]{3}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "release_tag": {"type": "string", "pattern": "^research-note-[0-9]{3}-v[0-9]+\\.[0-9]+$"},
+    "title": {"type": "string"},
+    "short_title": {"type": "string"},
+    "subtitle": {"type": "string"},
+    "authors": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "given_name", "family_name", "affiliation", "orcid"],
+        "properties": {
+          "name": {"type": "string"}, "given_name": {"type": "string"}, "family_name": {"type": "string"},
+          "affiliation": {"type": "string"}, "orcid": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "publisher": {"type": "string"},
+    "publication_date": {"type": "string", "format": "date"},
+    "language": {"type": "string"},
+    "publication_type": {"type": "string"},
+    "archive_resource_type": {
+      "type": "object", "additionalProperties": false,
+      "required": ["zenodo_upload_type", "zenodo_publication_type"],
+      "properties": {"zenodo_upload_type": {"type": "string"}, "zenodo_publication_type": {"type": "string"}}
+    },
+    "status": {"type": "string"},
+    "abstract": {"type": "string"},
+    "keywords": {"type": "array", "items": {"type": "string"}},
+    "license": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "spdx", "proposed", "scope"],
+      "properties": {
+        "status": {"enum": ["pending", "granted"]},
+        "spdx": {"type": ["string", "null"]},
+        "proposed": {"type": ["string", "null"]},
+        "scope": {"type": "string"}
+      }
+    },
+    "canonical_url": {"type": "string", "format": "uri"},
+    "repository_url": {"type": "string", "format": "uri"},
+    "release_url": {"type": "string", "format": "uri"},
+    "persistent_identifiers": {"type": "string"},
+    "files": {
+      "type": "array", "minItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "role", "media_type", "bytes", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "role": {"enum": ["source", "rendition"]},
+          "media_type": {"type": "string"},
+          "bytes": {"type": "integer", "minimum": 1},
+          "pages": {"type": "integer", "minimum": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "build": {
+      "type": "object", "additionalProperties": false,
+      "required": ["command", "renderer", "fonts", "source_date_epoch", "rebuild_check"],
+      "properties": {
+        "command": {"type": "string"},
+        "renderer": {"type": "string"},
+        "fonts": {"type": "string"},
+        "source_date_epoch": {"type": "integer"},
+        "rebuild_check": {"type": "string"}
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {"type": "object", "required": ["id", "title", "url"],
+                "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "url": {"type": "string", "format": "uri"}}}
+    },
+    "version_history": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["version", "date", "summary", "release_tag"],
+        "properties": {
+          "version": {"type": "string"}, "date": {"type": "string", "format": "date"},
+          "summary": {"type": "string"}, "release_tag": {"type": "string"}
+        }
+      }
+    }
+  }
+}

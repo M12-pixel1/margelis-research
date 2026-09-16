@@ -1,0 +1,253 @@
+{
+  "receipt_type": "margelis-research/publication-receipt/1",
+  "generated_at": "2026-09-16T16:59:09Z",
+  "generated_by": "python tools/publish.py receipt 001",
+  "note": "001",
+  "version": "1.0",
+  "title": "From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution",
+  "status": "PARTIAL",
+  "repository": {
+    "url": "https://github.com/M12-pixel1/margelis-research",
+    "exists": false,
+    "visibility": null,
+    "default_branch": null,
+    "immutable_releases_enabled": null,
+    "error": "gh: Not Found (HTTP 404)"
+  },
+  "commit_sha": null,
+  "release": {
+    "tag": "research-note-001-v1.0",
+    "exists": false,
+    "error": "gh: Not Found (HTTP 404)"
+  },
+  "canonical_website": {
+    "url": "https://rupestelisholding.com/research/001/",
+    "status": "NOT_DEPLOYED",
+    "page": {
+      "url": "https://rupestelisholding.com/research/001/",
+      "checked_at": "2026-09-16T16:59:08Z",
+      "http_status": 404,
+      "content_type": null
+    },
+    "pdf": {
+      "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
+      "checked_at": "2026-09-16T16:59:08Z",
+      "http_status": 404,
+      "content_type": null
+    }
+  },
+  "preview_website": {
+    "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
+    "pages_site": null,
+    "pages_status": null,
+    "pages_error": "gh: Not Found (HTTP 404)",
+    "deployment_id": null,
+    "deployment_commit": null,
+    "deployment_state": null,
+    "page": {
+      "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
+      "checked_at": "2026-09-16T16:59:07Z",
+      "http_status": 404,
+      "content_type": "text/html; charset=utf-8"
+    },
+    "pdf": {
+      "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
+      "checked_at": "2026-09-16T16:59:07Z",
+      "http_status": 404,
+      "content_type": "text/html; charset=utf-8"
+    },
+    "verified": false
+  },
+  "hashes": {
+    "pdf_sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+    "markdown_sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
+    "metadata_sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
+    "sha256sums_sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
+  },
+  "zenodo": {
+    "status": "NOT_STARTED",
+    "record_id": null,
+    "doi": null,
+    "reason": "no deposition has been created (ZENODO_ACCESS_TOKEN not provided)"
+  },
+  "doi": null,
+  "publication_timestamp": null,
+  "license": {
+    "status": "pending",
+    "spdx": null,
+    "proposed": "CC-BY-4.0"
+  },
+  "validation": {
+    "summary": {
+      "PASS": 29,
+      "FAIL": 0,
+      "WARN": 0,
+      "SKIP": 0
+    },
+    "results": [
+      {
+        "id": "note001.input_schema",
+        "status": "PASS",
+        "detail": "note.yaml valid"
+      },
+      {
+        "id": "note001.markdown_syntax",
+        "status": "PASS",
+        "detail": "only supported CommonMark + table elements"
+      },
+      {
+        "id": "note001.markdown_structure",
+        "status": "PASS",
+        "detail": "1 H1, 10 numbered sections + 1 end section(s), 1 table(s)"
+      },
+      {
+        "id": "note001.title_block",
+        "status": "PASS",
+        "detail": "series, title, subtitle, author, affiliation, number, version and date match note.yaml"
+      },
+      {
+        "id": "note001.locked_statements",
+        "status": "PASS",
+        "detail": "7 locked statements present verbatim"
+      },
+      {
+        "id": "note001.references_cited",
+        "status": "PASS",
+        "detail": "8 references, all cited and listed"
+      },
+      {
+        "id": "note001.github_render",
+        "status": "PASS",
+        "detail": "GitHub renders tables=1, rows=11/11, h2=11/11"
+      },
+      {
+        "id": "note001.external_links",
+        "status": "PASS",
+        "detail": "9 external URLs return HTTP 200"
+      },
+      {
+        "id": "note001.sha256sums",
+        "status": "PASS",
+        "detail": "PDF, Markdown and metadata.json match SHA256SUMS"
+      },
+      {
+        "id": "note001.metadata_schema",
+        "status": "PASS",
+        "detail": "metadata.json valid"
+      },
+      {
+        "id": "note001.metadata_consistency",
+        "status": "PASS",
+        "detail": "metadata.json matches note.yaml, references.json and file digests"
+      },
+      {
+        "id": "note001.pdf_opens",
+        "status": "PASS",
+        "detail": "7 pages, PDF 1.4, title and author set"
+      },
+      {
+        "id": "note001.pdf_fonts_embedded",
+        "status": "PASS",
+        "detail": "all 6 fonts embedded: DejaVuSans, DejaVuSans-Bold, DejaVuSansMono, DejaVuSerif, DejaVuSerif-Bold, DejaVuSerif-Italic"
+      },
+      {
+        "id": "note001.pdf_text",
+        "status": "PASS",
+        "detail": "23 title, section and locked-statement strings found in PDF text"
+      },
+      {
+        "id": "note001.pdf_links",
+        "status": "PASS",
+        "detail": "9 link annotations, identical to the Markdown links"
+      },
+      {
+        "id": "note001.citation_cff_schema",
+        "status": "PASS",
+        "detail": "CITATION.cff valid against CFF 1.2.0 schema"
+      },
+      {
+        "id": "note001.citation_cff_consistency",
+        "status": "PASS",
+        "detail": "CITATION.cff title, version, date, authors, URLs and DOI/license state match the note"
+      },
+      {
+        "id": "note001.site_page",
+        "status": "PASS",
+        "detail": "canonical, OpenGraph, citation_* and JSON-LD match the note; no scripts; versioned files match SHA256SUMS"
+      },
+      {
+        "id": "note001.zenodo_metadata",
+        "status": "PASS",
+        "detail": "payload matches note metadata; no Zenodo deposition yet"
+      },
+      {
+        "id": "note001.license_consistency",
+        "status": "PASS",
+        "detail": "license pending consistently in all files"
+      },
+      {
+        "id": "note001.versioning",
+        "status": "PASS",
+        "detail": "research-note-001-v1.0 not released yet; artifacts may still change"
+      },
+      {
+        "id": "note001.published_claims",
+        "status": "PASS",
+        "detail": "no novelty/marketing language in 23 published files"
+      },
+      {
+        "id": "note001.name_spelling",
+        "status": "PASS",
+        "detail": "author, organization, series and date spelled consistently"
+      },
+      {
+        "id": "note001.pdf_reproducible",
+        "status": "PASS",
+        "detail": "rebuilt PDF sha256 7514290ac9c6ecc6… == SHA256SUMS 7514290ac9c6ecc6…"
+      },
+      {
+        "id": "benchmark.scenarios",
+        "status": "PASS",
+        "detail": "10 scenarios valid; one per Research Note 001 case"
+      },
+      {
+        "id": "benchmark.receipt_schema",
+        "status": "PASS",
+        "detail": "2 synthetic examples valid; 4 invalid mutations rejected"
+      },
+      {
+        "id": "benchmark.no_results_published",
+        "status": "PASS",
+        "detail": "results/ contains only README.md"
+      },
+      {
+        "id": "repo.internal_links",
+        "status": "PASS",
+        "detail": "62 relative links resolve (site pages and repository docs)"
+      },
+      {
+        "id": "repo.secret_scan",
+        "status": "PASS",
+        "detail": "70 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "item": "canonical_website",
+      "state": "NOT_DEPLOYED",
+      "http_status": 404,
+      "cause": "The research pages are not yet deployed to the canonical host."
+    },
+    {
+      "item": "zenodo_doi",
+      "state": "NOT_STARTED",
+      "cause": "No Zenodo access token has been provided."
+    },
+    {
+      "item": "license",
+      "state": "PENDING",
+      "cause": "No license has been granted for the note text; an open-access archive record requires one."
+    }
+  ]
+}

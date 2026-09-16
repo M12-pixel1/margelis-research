@@ -1,0 +1,220 @@
+{
+  "schema": "margelis-research/note-metadata/1",
+  "id": "margelis-research-note-001",
+  "series": "Margelis Research",
+  "number": "001",
+  "version": "1.0",
+  "release_tag": "research-note-001-v1.0",
+  "title": "From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution",
+  "short_title": "From Mandate to Verified Outcome",
+  "subtitle": "An Evaluation Framework for Autonomous Agent Execution",
+  "authors": [
+    {
+      "name": "Tomas Margelis",
+      "given_name": "Tomas",
+      "family_name": "Margelis",
+      "affiliation": "Rūpestėlis Holding",
+      "orcid": null
+    }
+  ],
+  "publisher": "Rūpestėlis Holding",
+  "publication_date": "2026-09-16",
+  "language": "en",
+  "publication_type": "research note",
+  "archive_resource_type": {
+    "zenodo_upload_type": "publication",
+    "zenodo_publication_type": "technicalnote"
+  },
+  "status": "Concept + Evaluation Framework",
+  "abstract": "A technical evaluation framework for testing whether consequential autonomous-agent execution remains continuously bound to an accountable human or institutional mandate through runtime authorization, execution, external state change, independent verification and outcome receipt.",
+  "keywords": [
+    "AI agents",
+    "AI governance",
+    "autonomous agents",
+    "delegated authority",
+    "authorization",
+    "verified outcomes",
+    "agent security",
+    "enterprise AI",
+    "AI reliability",
+    "benchmarking"
+  ],
+  "license": {
+    "status": "pending",
+    "spdx": null,
+    "proposed": "CC-BY-4.0",
+    "scope": "Research Note text only (the Markdown and PDF files of this note). It does not apply to production code, Tutela, Authority Plane, Revenue OS, proprietary enforcement logic, internal datasets, private benchmarks, customer data or confidential architectures."
+  },
+  "canonical_url": "https://rupestelisholding.com/research/001/",
+  "repository_url": "https://github.com/M12-pixel1/margelis-research",
+  "release_url": "https://github.com/M12-pixel1/margelis-research/releases/tag/research-note-001-v1.0",
+  "persistent_identifiers": "Identifiers assigned after release (such as a DOI) are recorded in publication-receipt.json and CITATION.cff. This manifest is immutable per version.",
+  "files": [
+    {
+      "path": "Margelis_Research_Note_001.md",
+      "role": "source",
+      "media_type": "text/markdown; charset=utf-8",
+      "bytes": 11814,
+      "sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8"
+    },
+    {
+      "path": "Margelis_Research_Note_001.pdf",
+      "role": "rendition",
+      "media_type": "application/pdf",
+      "bytes": 251688,
+      "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+      "pages": 7
+    }
+  ],
+  "build": {
+    "command": "python tools/publish.py build 001",
+    "renderer": "ReportLab 4.5.0 (invariant mode, uncompressed streams), markdown-it-py 4.0.0",
+    "fonts": "DejaVu 2.35 (tools/fonts), embedded subsets",
+    "source_date_epoch": 1789516800,
+    "rebuild_check": "python tools/publish.py verify 001 --rebuild"
+  },
+  "references": [
+    {
+      "id": "aidp",
+      "type": "internet-draft",
+      "title": "Agent Interaction & Delegation Protocol (AIDP)",
+      "authors": [
+        "I. Vandoulas"
+      ],
+      "author_affiliations": [
+        "Mechapiens"
+      ],
+      "identifier": "draft-vandoulas-aidp-03",
+      "date": "2026-07-20",
+      "status": "IETF Internet-Draft, individual submission, intended status Informational, work in progress",
+      "url": "https://datatracker.ietf.org/doc/draft-vandoulas-aidp/",
+      "checked_against": [
+        "https://datatracker.ietf.org/api/v1/doc/document/draft-vandoulas-aidp/",
+        "https://www.ietf.org/archive/id/draft-vandoulas-aidp-03.txt"
+      ]
+    },
+    {
+      "id": "gallo-2026-poc",
+      "type": "preprint",
+      "title": "Proof-of-Continuity: A Temporal Model for Authority Propagation in Distributed Systems and AI Agents",
+      "authors": [
+        "Nicola Gallo"
+      ],
+      "identifier": "arXiv:2607.08906",
+      "date": "2026-07-09",
+      "status": "arXiv preprint (v1), primary category cs.CR",
+      "url": "https://arxiv.org/abs/2607.08906",
+      "checked_against": [
+        "https://export.arxiv.org/api/query?id_list=2607.08906"
+      ]
+    },
+    {
+      "id": "zhang-2026-authorized",
+      "type": "preprint",
+      "title": "Are You Still the Agent I Authorized? Earned Authority under a Fixed Ceiling for Evolving Agents",
+      "authors": [
+        "Zhaoxi Zhang",
+        "Xiaomei Zhang"
+      ],
+      "identifier": "arXiv:2607.23586",
+      "date": "2026-07-26",
+      "status": "arXiv preprint (v1), primary category cs.AI",
+      "url": "https://arxiv.org/abs/2607.23586",
+      "checked_against": [
+        "https://export.arxiv.org/api/query?id_list=2607.23586"
+      ]
+    },
+    {
+      "id": "he-2026-continuity-kernel",
+      "type": "preprint",
+      "title": "Beyond Memory: A Transactional Continuity Kernel for Long-Lived AI Agents",
+      "authors": [
+        "Jun He",
+        "Deying Yu"
+      ],
+      "identifier": "arXiv:2608.11632",
+      "date": "2026-08-12",
+      "status": "arXiv preprint (v1), primary category cs.MA",
+      "url": "https://arxiv.org/abs/2608.11632",
+      "checked_against": [
+        "https://export.arxiv.org/api/query?id_list=2608.11632"
+      ]
+    },
+    {
+      "id": "authzen-api-1.0",
+      "type": "specification",
+      "title": "Authorization API 1.0",
+      "authors": [
+        "O. Gazitt (Ed.)",
+        "D. Brossard (Ed.)",
+        "A. Tulshibagwale (Ed.)"
+      ],
+      "publisher": "OpenID Foundation, AuthZEN Working Group",
+      "date": "2026-01-11",
+      "status": "Final Specification",
+      "url": "https://openid.net/specs/authorization-api-1_0.html",
+      "related_urls": [
+        "https://openid.net/wg/authzen/specifications/"
+      ],
+      "checked_against": [
+        "https://openid.net/specs/authorization-api-1_0.html",
+        "https://openid.net/wg/authzen/specifications/"
+      ]
+    },
+    {
+      "id": "spiffe",
+      "type": "website",
+      "title": "SPIFFE: Secure Production Identity Framework for Everyone (with SPIRE, the SPIFFE Runtime Environment)",
+      "url": "https://spiffe.io/",
+      "checked_against": [
+        "https://spiffe.io/"
+      ]
+    },
+    {
+      "id": "cedar-docs",
+      "type": "documentation",
+      "title": "Cedar Policy Language Reference Guide",
+      "url": "https://docs.cedarpolicy.com/",
+      "checked_against": [
+        "https://docs.cedarpolicy.com/"
+      ]
+    },
+    {
+      "id": "cutler-2024-cedar",
+      "type": "preprint",
+      "title": "Cedar: A New Language for Expressive, Fast, Safe, and Analyzable Authorization (Extended Version)",
+      "authors": [
+        "Joseph W. Cutler",
+        "Craig Disselkoen",
+        "Aaron Eline",
+        "Shaobo He",
+        "Kyle Headley",
+        "Michael Hicks",
+        "Kesha Hietala",
+        "Eleftherios Ioannidis",
+        "John Kastner",
+        "Anwar Mamat",
+        "Darin McAdams",
+        "Matt McCutchen",
+        "Neha Rungta",
+        "Emina Torlak",
+        "Andrew Wells"
+      ],
+      "identifier": "arXiv:2403.04651",
+      "date": "2024-03-07",
+      "status": "arXiv preprint",
+      "url": "https://arxiv.org/abs/2403.04651",
+      "checked_against": [
+        "https://export.arxiv.org/api/query?id_list=2403.04651"
+      ]
+    }
+  ],
+  "version_history": [
+    {
+      "version": "1.0",
+      "date": "2026-09-16",
+      "summary": "Initial publication.",
+      "release_tag": "research-note-001-v1.0"
+    }
+  ]
+}

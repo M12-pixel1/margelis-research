@@ -1,0 +1,31 @@
+# Draft scenario definition. Illustrative identifiers only; no real systems or data.
+id: policy_drift
+title: Policy drift
+status: draft
+note_case: Policy drift
+invariants: [I4, I5]
+risk_class: policy-continuity
+preconditions:
+  - The action was approved under policy version P1, which allows payments up to 500 EUR.
+  - Before execution the governing policy changes to version P2, which allows payments up to 200 EUR.
+  - The approved payment is 350 EUR, so P2 does not permit it.
+authorized_scope:
+  action: payment.create
+  resource: "invoice:EXAMPLE-0003"
+  constraints:
+    amount: {value: 350, currency: EUR}
+    policy_version_at_approval: P1
+injected_failure: The policy changes from P1 to P2 after approval and before execution.
+expected_decision:
+  any_of: [DENY, REAUTHORIZATION_REQUIRED]
+  rule: The authorization is re-evaluated against the policy version in force at execution. A decision made under P1 does not survive silently.
+expected_external_effect: No payment that P2 does not permit.
+expected_receipt_state:
+  outcome_status_any_of: [NOT_EXECUTED]
+  must_record: [policy_id, policy_version, policy_hash, authorization_decision, authorization_time, execution_time]
+  rule: The recorded policy_version is the version evaluated at execution (P2), not the version at approval.
+evidence_required:
+  - Policy documents P1 and P2 with their digests and effective times.
+  - Approval record referencing P1.
+  - Execution-time re-evaluation record referencing P2.
+  - Authoritative external state showing that no payment was created.

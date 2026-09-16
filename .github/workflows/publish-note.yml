@@ -1,0 +1,60 @@
+name: publish-note
+
+# Manual pipeline for a committed, built note:
+#   check            all checks + PDF rebuild
+#   release-dry-run  print the release that would be created
+#   release          immutable GitHub release (refuses to overwrite an existing tag)
+#   zenodo-draft     private Zenodo draft with reserved DOI; never publishes
+# Publishing the Zenodo record is a local, human-confirmed step:
+#   python tools/publish.py zenodo NNN --publish --confirm-doi <DOI>
+on:
+  workflow_dispatch:
+    inputs:
+      note:
+        description: Note number, e.g. 002
+        required: true
+      action:
+        description: Step to run
+        type: choice
+        default: check
+        options: [check, release-dry-run, release, zenodo-draft]
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-24.04
+    env:
+      NOTE: ${{ inputs.note }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Install pinned tools
+        run: python -m pip install -r tools/requirements.txt
+      - name: Check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/publish.py verify "$NOTE" --rebuild --online
+      - name: GitHub release
+        if: inputs.action == 'release' || inputs.action == 'release-dry-run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.action == 'release-dry-run' && '--dry-run' || '' }}
+        run: python tools/publish.py release "$NOTE" $DRY_RUN
+      - name: Zenodo draft (no publication)
+        if: inputs.action == 'zenodo-draft'
+        env:
+          ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
+        run: python tools/publish.py zenodo "$NOTE"
+      - name: Keep Zenodo draft record
+        if: inputs.action == 'zenodo-draft'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
+        with:
+          name: zenodo-${{ inputs.note }}
+          path: research/*/zenodo.json
+          if-no-files-found: warn

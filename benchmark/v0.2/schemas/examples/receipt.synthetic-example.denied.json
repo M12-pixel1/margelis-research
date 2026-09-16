@@ -1,0 +1,32 @@
+{
+  "receipt_version": "0.2-draft",
+  "receipt_id": "synthetic-example-expired-mandate-0001",
+  "principal_id": "principal:example-finance-approver",
+  "mandate_id": "mandate:EXAMPLE-M-0001",
+  "mandate_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000001",
+  "policy_id": "policy:example-payments",
+  "policy_version": "P1",
+  "policy_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000002",
+  "executor_identity": "spiffe://example.test/agent/payments-executor",
+  "model_identity": "model:example-model-a",
+  "tool_identity": "tool:example-payments-api",
+  "requested_action": {
+    "type": "payment.create",
+    "resource": "invoice:EXAMPLE-0001",
+    "parameters": {"amount": {"value": 500, "currency": "EUR"}}
+  },
+  "authorized_action": null,
+  "executed_action": null,
+  "authorization_decision": "DENY",
+  "authorization_time": "2026-01-01T10:12:00Z",
+  "execution_time": null,
+  "verification_time": "2026-01-01T10:13:00Z",
+  "external_state_reference": "example-payments-api:invoice:EXAMPLE-0001:payments",
+  "verification_source": "verifier:example-independent-reader",
+  "outcome_status": "NOT_EXECUTED",
+  "evidence_hashes": [
+    "sha256:0000000000000000000000000000000000000000000000000000000000000003"
+  ],
+  "causal_parent_receipts": [],
+  "signature": null
+}

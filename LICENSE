@@ -1,0 +1,18 @@
+LICENSE STATUS: PENDING
+
+No license has been granted yet for the contents of this repository.
+
+A license decision is pending. Until a license is published in this file, the
+contents are made available for reading only, and all other rights are reserved
+by the rights holder(s).
+
+Proposed, not granted: Creative Commons Attribution 4.0 International
+(CC BY 4.0) for the text of the Margelis Research Notes only, i.e. the Markdown
+and PDF files under research/. If granted, that license would not extend to
+production code, Tutela, Authority Plane, Revenue OS, proprietary enforcement
+logic, internal datasets, private benchmarks, customer data or confidential
+architectures. None of these are contained in this repository.
+
+Third-party material with its own license:
+
+  tools/fonts/*.ttf   DejaVu fonts 2.35, see tools/fonts/LICENSE-DejaVu.txt
