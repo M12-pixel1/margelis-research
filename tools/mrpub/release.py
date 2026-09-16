@@ -35,7 +35,7 @@ def notes_markdown(note: Note) -> str:
     unproven = note.meta.get("locked_statements", {}).get("What remains unproven", [])
     rows = "\n".join(f"| `{name}` | `{digest}` |" for name, digest in sums.items())
     lines = [
-        f"**{note.series_name} Note {note.number}: {note.full_title}**",
+        f"**{note.series_name} Note {note.number} — {note.full_title}**",
         "",
         "| | |",
         "| --- | --- |",
@@ -87,7 +87,7 @@ def create(note: Note, dry_run: bool = False) -> dict:
         raise PipelineError(f"{tag} already exists; published versions are never overwritten")
     files = [note.pdf_path, note.md_path, note.metadata_path, note.sums_path]
     body = notes_markdown(note)
-    title = f"{note.series_name} Note {note.number}: {note.title}"
+    title = f"{note.series_name} Note {note.number} — {note.title}"
     if dry_run:
         print(f"[dry-run] would create {tag} at {head} titled {title!r} with {[f.name for f in files]}\n")
         print(body)
