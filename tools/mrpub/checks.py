@@ -263,9 +263,14 @@ class NoteChecks:
         n = self.note
         current = load_json(n.metadata_path)
         expected = build_metadata(n, pdf_pages=current["files"][1].get("pages"))
-        diffs = [k for k in expected if expected[k] != current.get(k)]
+        released = bool(git("tag", "-l", n.tag, check=False))
+        # A released manifest records the license status at release time; later grants live elsewhere.
+        diffs = [k for k in expected if expected[k] != current.get(k) and not (released and k == "license")]
+        if released and expected["license"] != current["license"] and current["license"]["status"] != "pending":
+            diffs.append("license")
         return (FAIL, f"metadata.json differs from note.yaml/files in: {diffs}") if diffs else \
-            (PASS, "metadata.json matches note.yaml, references.json and file digests")
+            (PASS, "metadata.json matches note.yaml, references.json and file digests"
+             + (" (license as recorded at release)" if released and expected["license"] != current["license"] else ""))
 
     def _pdf(self) -> PdfReader:
         return PdfReader(str(self.note.pdf_path))
@@ -470,8 +475,11 @@ class NoteChecks:
                 problems.append("LICENSE does not name the granted license")
             if cff.get("license") != spdx:
                 problems.append("CITATION.cff license missing")
-            if meta.get("spdx") != spdx:
+            released_before_grant = bool(git("tag", "-l", n.tag, check=False)) and meta.get("status") == "pending"
+            if meta.get("spdx") != spdx and not released_before_grant:
                 problems.append("metadata.json license missing")
+            if spdx not in page:
+                problems.append("web page does not show the granted license")
         else:
             if "No license has been granted" not in lic_file:
                 problems.append("LICENSE does not state that no license is granted")

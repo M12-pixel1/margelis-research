@@ -15,6 +15,9 @@ Publication steps (outward-facing)
   zenodo NNN [--sandbox] [--dry-run]         create/verify a private Zenodo draft, reserve the DOI
   zenodo NNN --publish --confirm-doi DOI     publish the draft (irreversible; needs a granted license)
 
+Human decision
+  grant-license NNN --spdx CC-BY-4.0 --by NAME --on YYYY-MM-DD   record an explicit license grant
+
 Exit codes: 0 ok, 1 failed check or error, 3 blocked on a missing credential.
 """
 from __future__ import annotations
@@ -137,6 +140,30 @@ TODO
     return 0
 
 
+def cmd_grant_license(args) -> int:
+    """Record an explicit license grant in note.yaml (the only place a license can come from)."""
+    import datetime as dt
+    import re
+    note = load_note(args.number)
+    if note.license_granted:
+        raise PipelineError(f"note {note.number} already records a granted license ({note.license['spdx']})")
+    dt.date.fromisoformat(args.on)
+    path = note.dir / "note.yaml"
+    text = path.read_text(encoding="utf-8")
+    for pattern, value in ((r"^  status: pending$", "  status: granted"),
+                           (r"^  spdx: null$", f"  spdx: {args.spdx}"),
+                           (r"^  authorized_by: null$", f'  authorized_by: "{args.by}"'),
+                           (r"^  authorized_on: null$", f'  authorized_on: "{args.on}"')):
+        text, count = re.subn(pattern, value, text, count=1, flags=re.M)
+        if count != 1:
+            raise PipelineError(f"could not find '{pattern}' in {path}")
+    write_text(path, text)
+    print(f"Recorded: {args.spdx} granted by {args.by} on {args.on} for note {note.number}.\n"
+          f"Next: python tools/publish.py build {note.number} && python tools/publish.py check {note.number} --online,\n"
+          f"      commit + push, then python tools/publish.py release {note.number} --update-notes")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -154,11 +181,15 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("zenodo"); s.add_argument("number"); s.add_argument("--sandbox", action="store_true")
     s.add_argument("--dry-run", action="store_true"); s.add_argument("--publish", action="store_true")
     s.add_argument("--confirm-doi")
+    s = sub.add_parser("grant-license"); s.add_argument("number"); s.add_argument("--spdx", required=True)
+    s.add_argument("--by", required=True); s.add_argument("--on", required=True, help="YYYY-MM-DD")
     args = p.parse_args(argv)
 
     try:
         if args.cmd == "new":
             return cmd_new(args)
+        if args.cmd == "grant-license":
+            return cmd_grant_license(args)
         if args.cmd == "check":
             return 0 if show(run_checks(args.numbers or all_notes(), args.online)) else 1
         if args.cmd == "check-benchmark":

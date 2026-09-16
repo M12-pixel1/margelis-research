@@ -1,6 +1,6 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-16T17:05:52Z",
+  "generated_at": "2026-09-16T17:09:21Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.0",
@@ -66,13 +66,13 @@
     "status": "NOT_DEPLOYED",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-16T17:05:51Z",
+      "checked_at": "2026-09-16T17:09:20Z",
       "http_status": 404,
       "content_type": null
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T17:05:52Z",
+      "checked_at": "2026-09-16T17:09:21Z",
       "http_status": 404,
       "content_type": null
     }
@@ -87,13 +87,13 @@
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-16T17:05:50Z",
+      "checked_at": "2026-09-16T17:09:19Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T17:05:50Z",
+      "checked_at": "2026-09-16T17:09:20Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
