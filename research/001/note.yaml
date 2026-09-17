@@ -7,8 +7,8 @@
 # version entry below; the pipeline refuses to overwrite a released version.
 
 number: "001"
-version: "1.0"
-date: "2026-09-16"
+version: "1.1"
+date: "2026-09-17"
 
 title: From Mandate to Verified Outcome
 subtitle: An Evaluation Framework for Autonomous Agent Execution
@@ -91,3 +91,12 @@ version_history:
   - version: "1.0"
     date: "2026-09-16"
     summary: Initial publication.
+  - version: "1.1"
+    date: "2026-09-17"
+    summary: Corrections to definitions and wording; claims and positioning unchanged.
+    changes:
+      - "Section 5: the Unauthorized Effect, False-Success, Replay Violation and Unverified Outcome rates are now defined as shares of an explicit population."
+      - "Section 3 (I4): 'Material authorization' now reads 'Material-action authorization', the term used in section 4."
+      - "Section 4 (Expired mandate): the failure now states that the mandate, rather than an undefined 'grant', expires before execution."
+      - "Section 10: 'once independent rerun is possible' now reads 'once an independent rerun is possible'; 'indirect-execution tests' is hyphenated as in I9."
+      - "Section 7: the cited sources were re-checked on 17 September 2026 with no changes; version, date, version history and citation updated."
