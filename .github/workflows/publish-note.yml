@@ -5,8 +5,9 @@ name: publish-note
 #   release-dry-run  print the release that would be created
 #   release          immutable GitHub release (refuses to overwrite an existing tag)
 #   zenodo-draft     private Zenodo draft with reserved DOI; never publishes
-# Publishing the Zenodo record is a local, human-confirmed step:
-#   python tools/publish.py zenodo NNN --publish --confirm-doi <DOI>
+#   zenodo-publish   publish the existing draft (IRREVERSIBLE); runs only when
+#                    confirm_doi equals the DOI reserved for that draft and the
+#                    license is granted in note.yaml
 on:
   workflow_dispatch:
     inputs:
@@ -17,7 +18,11 @@ on:
         description: Step to run
         type: choice
         default: check
-        options: [check, release-dry-run, release, zenodo-draft]
+        options: [check, release-dry-run, release, zenodo-draft, zenodo-publish]
+      confirm_doi:
+        description: For zenodo-publish only - the reserved DOI shown by zenodo-draft
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -51,8 +56,14 @@ jobs:
         env:
           ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
         run: python tools/publish.py zenodo "$NOTE"
-      - name: Keep Zenodo draft record (also after a partial failure)
-        if: always() && inputs.action == 'zenodo-draft'
+      - name: Zenodo publish (irreversible)
+        if: inputs.action == 'zenodo-publish'
+        env:
+          ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
+          CONFIRM_DOI: ${{ inputs.confirm_doi }}
+        run: python tools/publish.py zenodo "$NOTE" --publish --confirm-doi "$CONFIRM_DOI"
+      - name: Keep Zenodo record (also after a partial failure)
+        if: always() && (inputs.action == 'zenodo-draft' || inputs.action == 'zenodo-publish')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: zenodo-${{ inputs.note }}
