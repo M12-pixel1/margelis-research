@@ -1,11 +1,11 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-17T05:56:32Z",
+  "generated_at": "2026-09-17T06:05:52Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.0",
   "title": "From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution",
-  "status": "PARTIAL",
+  "status": "COMPLETE",
   "repository": {
     "url": "https://github.com/M12-pixel1/margelis-research",
     "exists": true,
@@ -63,16 +63,16 @@
   },
   "canonical_website": {
     "url": "https://rupestelisholding.com/research/001/",
-    "status": "STALE_OR_INCONSISTENT",
+    "status": "LIVE",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-17T05:56:31Z",
+      "checked_at": "2026-09-17T06:05:50Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T05:56:31Z",
+      "checked_at": "2026-09-17T06:05:50Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -80,8 +80,8 @@
     },
     "license_check": {
       "expected": "CC-BY-4.0 (applies to the note text only)",
-      "observed": "Not yet granted: a license decision is pending, so no reuse rights are granted at this time.",
-      "matches": false
+      "observed": "CC-BY-4.0 (applies to the note text only)",
+      "matches": true
     }
   },
   "preview_website": {
@@ -89,18 +89,18 @@
     "pages_site": "https://m12-pixel1.github.io/margelis-research/",
     "pages_status": null,
     "pages_error": null,
-    "deployment_id": 6493004077,
-    "deployment_commit": "e9f10836f5d423358d3af3151b8a0a82c809b9c1",
+    "deployment_id": 6496646668,
+    "deployment_commit": "f7239b3bc3b73e55432dbe4d03ec038ccc6fa698",
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-17T05:56:29Z",
+      "checked_at": "2026-09-17T06:05:48Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T05:56:30Z",
+      "checked_at": "2026-09-17T06:05:49Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -115,14 +115,17 @@
     "sha256sums_sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
   },
   "zenodo": {
-    "status": "DRAFT",
+    "status": "PUBLISHED",
     "environment": "production",
     "deposition_id": 22806278,
     "record_id": 22806278,
     "reserved_doi": "10.5281/zenodo.22806278",
-    "doi": null
+    "doi": "10.5281/zenodo.22806278",
+    "public_api_status": 200,
+    "record_url": "https://zenodo.org/records/22806278",
+    "files_match": true
   },
-  "doi": null,
+  "doi": "10.5281/zenodo.22806278",
   "publication_timestamp": "2026-09-16T17:04:13Z",
   "license": {
     "status": "granted",
@@ -230,7 +233,7 @@
       {
         "id": "note001.zenodo_metadata",
         "status": "PASS",
-        "detail": "payload matches note metadata; Zenodo production deposition 22806278 state=draft"
+        "detail": "payload matches note metadata; Zenodo production deposition 22806278 state=published"
       },
       {
         "id": "note001.license_consistency",
@@ -289,22 +292,5 @@
       }
     ]
   },
-  "blockers": [
-    {
-      "item": "canonical_website",
-      "state": "STALE_OR_INCONSISTENT",
-      "http_status": 200,
-      "license_check": {
-        "expected": "CC-BY-4.0 (applies to the note text only)",
-        "observed": "Not yet granted: a license decision is pending, so no reuse rights are granted at this time.",
-        "matches": false
-      },
-      "cause": "The canonical page license text does not match the note's granted/pending license state."
-    },
-    {
-      "item": "zenodo_doi",
-      "state": "DRAFT",
-      "cause": "The Zenodo draft has not been published."
-    }
-  ]
+  "blockers": []
 }
