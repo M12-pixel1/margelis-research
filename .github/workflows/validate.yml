@@ -28,6 +28,8 @@ jobs:
         run: python tools/test_zenodo_flow.py
       - name: Verified Delegation Benchmark P0 harness self-test
         run: python benchmark/v0.2/harness/runner.py
+      - name: Verified Delegation Benchmark P0 process sandbox
+        run: python benchmark/v0.2/sandbox/runner.py
       - name: Checks, byte-for-byte PDF rebuild, secret scan
         env:
           GITHUB_TOKEN: ${{ github.token }}
