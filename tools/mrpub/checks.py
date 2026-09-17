@@ -690,9 +690,9 @@ def check_benchmark() -> list[Result]:
                       "; ".join(problems) if problems else
                       f"{len(examples)} synthetic examples valid; {len(negatives)} invalid mutations rejected"))
 
-    extra = [p.name for p in (root / "results").iterdir() if p.name != "README.md"]
-    out.append(Result("benchmark.no_results_published", FAIL if extra else PASS,
-                      f"unexpected files in results/: {extra}" if extra else "results/ contains only README.md"))
+    from .benchmark_results import validate_results_dir
+    results_ok, results_detail = validate_results_dir(root)
+    out.append(Result("benchmark.result_bundles", PASS if results_ok else FAIL, results_detail))
     return out
 
 
