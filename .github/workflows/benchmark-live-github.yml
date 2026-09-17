@@ -1,11 +1,12 @@
 name: Verified Delegation Benchmark live GitHub sandbox
 
 on:
-  push:
-    branches: [benchmark/v0.2-p0-github-live]
-    paths:
-      - benchmark/v0.2/live/TRIGGER
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type RUN_LIVE_GITHUB_P0_3 to create and close synthetic GitHub Issues"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -17,6 +18,7 @@ concurrency:
 
 jobs:
   live-github-sandbox:
+    if: ${{ inputs.confirm == 'RUN_LIVE_GITHUB_P0_3' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
