@@ -64,16 +64,16 @@ license:
   # pending -> no license has been granted; the pipeline refuses to publish
   # an open-access Zenodo record and writes no license into citation files.
   # To grant: set status: granted, spdx: CC-BY-4.0, authorized_by, authorized_on.
-  status: pending
-  spdx: null
+  status: granted
+  spdx: CC-BY-4.0
   proposed: CC-BY-4.0
   scope: >-
     Research Note text only (the Markdown and PDF files of this note). It does
     not apply to production code, Tutela, Authority Plane, Revenue OS,
     proprietary enforcement logic, internal datasets, private benchmarks,
     customer data or confidential architectures.
-  authorized_by: null
-  authorized_on: null
+  authorized_by: "Tomas Margelis"
+  authorized_on: "2026-09-17"
 
 # Statements that must appear verbatim inside the named section.
 locked_statements:
