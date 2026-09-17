@@ -25,7 +25,11 @@ keywords:
 - benchmarking
 repository-code: https://github.com/M12-pixel1/margelis-research
 url: https://rupestelisholding.com/research/001/
+doi: 10.5281/zenodo.22806682
 identifiers:
+- type: doi
+  value: 10.5281/zenodo.22806682
+  description: Archived record of Margelis Research Note 001 v1.1
 - type: doi
   value: 10.5281/zenodo.22806277
   description: All versions of Margelis Research Note 001 (resolves to the latest)
@@ -48,4 +52,5 @@ preferred-citation:
   url: https://rupestelisholding.com/research/001/
   repository-code: https://github.com/M12-pixel1/margelis-research
   notes: 'Margelis Research Note 001, version 1.1. Status: Concept + Evaluation Framework.'
+  doi: 10.5281/zenodo.22806682
   license: CC-BY-4.0

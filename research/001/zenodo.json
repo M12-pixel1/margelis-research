@@ -49,7 +49,7 @@
       "record_id": 22806682,
       "concept_record_id": "22806277",
       "reserved_doi": "10.5281/zenodo.22806682",
-      "state": "draft",
+      "state": "published",
       "draft_url": "https://zenodo.org/deposit/22806682",
       "access_right": "open",
       "license": "cc-by-4.0",
@@ -76,7 +76,12 @@
         }
       ],
       "metadata_matches": true,
-      "checked_at": "2026-09-17T06:25:39Z"
+      "checked_at": "2026-09-17T06:30:42Z",
+      "doi": "10.5281/zenodo.22806682",
+      "doi_url": "https://doi.org/10.5281/zenodo.22806682",
+      "record_url": "https://zenodo.org/record/22806682",
+      "concept_doi": "10.5281/zenodo.22806277",
+      "published_at": "2026-09-17T06:30:45Z"
     }
   }
 }
