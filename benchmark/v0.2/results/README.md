@@ -1,11 +1,9 @@
 # Results
 
-This directory is empty by design.
+Published Verified Delegation Benchmark v0.2 result bundles live here only when they include durable raw evidence, exact source/harness provenance, independent rerun instructions and pass the deterministic result-bundle validator.
 
-No Verified Delegation Benchmark results have been generated. Results will be
-added only together with the raw evidence, the exact system-under-test and
-harness versions, and instructions that allow an independent rerun
-(see `../SPEC.md`, section 8).
+## Published results
 
-`python tools/publish.py check` fails if any other file appears here before that
-publication rule is met.
+- [`github-p0-3-repeatability-2026-09-17/`](github-p0-3-repeatability-2026-09-17/) — published 2026-09-17; GitHub Issues P0-3 repeatability result; two independent live runs; expired mandate, replay and false-DONE scenarios; bounded unsafe vs guarded reference systems.
+
+The result's stated limitations are normative. Do not generalize it to payments, CRM, deployment providers, commercial agent products or industry-wide performance without additional evidence.
