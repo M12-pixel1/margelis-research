@@ -1,6 +1,6 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-16T23:54:42Z",
+  "generated_at": "2026-09-17T05:56:32Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.0",
@@ -11,7 +11,7 @@
     "exists": true,
     "visibility": "public",
     "default_branch": "main",
-    "immutable_releases_enabled": null,
+    "immutable_releases_enabled": true,
     "error": null
   },
   "commit_sha": "200103f8e3e64e609140d543f5988a363a76683d",
@@ -63,39 +63,44 @@
   },
   "canonical_website": {
     "url": "https://rupestelisholding.com/research/001/",
-    "status": "LIVE",
+    "status": "STALE_OR_INCONSISTENT",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-16T23:54:40Z",
+      "checked_at": "2026-09-17T05:56:31Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T23:54:41Z",
+      "checked_at": "2026-09-17T05:56:31Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
       "sha256_matches": true
+    },
+    "license_check": {
+      "expected": "CC-BY-4.0 (applies to the note text only)",
+      "observed": "Not yet granted: a license decision is pending, so no reuse rights are granted at this time.",
+      "matches": false
     }
   },
   "preview_website": {
     "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-    "pages_site": null,
+    "pages_site": "https://m12-pixel1.github.io/margelis-research/",
     "pages_status": null,
-    "pages_error": "gh: Access to this GitHub API path is not permitted through this proxy. (HTTP 403)",
-    "deployment_id": 6486190265,
-    "deployment_commit": "9e5481172170fc0af9aef7f93e1287702fd986ab",
+    "pages_error": null,
+    "deployment_id": 6493004077,
+    "deployment_commit": "e9f10836f5d423358d3af3151b8a0a82c809b9c1",
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-16T23:54:39Z",
+      "checked_at": "2026-09-17T05:56:29Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-16T23:54:39Z",
+      "checked_at": "2026-09-17T05:56:30Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
@@ -110,10 +115,12 @@
     "sha256sums_sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
   },
   "zenodo": {
-    "status": "NOT_STARTED",
-    "record_id": null,
-    "doi": null,
-    "reason": "no deposition has been created (ZENODO_ACCESS_TOKEN not provided)"
+    "status": "DRAFT",
+    "environment": "production",
+    "deposition_id": 22806278,
+    "record_id": 22806278,
+    "reserved_doi": "10.5281/zenodo.22806278",
+    "doi": null
   },
   "doi": null,
   "publication_timestamp": "2026-09-16T17:04:13Z",
@@ -124,9 +131,9 @@
   },
   "validation": {
     "summary": {
-      "PASS": 28,
+      "PASS": 30,
       "FAIL": 0,
-      "WARN": 1,
+      "WARN": 0,
       "SKIP": 0
     },
     "results": [
@@ -162,8 +169,8 @@
       },
       {
         "id": "note001.github_render",
-        "status": "WARN",
-        "detail": "GitHub Markdown API HTTP 403"
+        "status": "PASS",
+        "detail": "GitHub renders tables=1, rows=11/11, h2=11/11"
       },
       {
         "id": "note001.external_links",
@@ -223,7 +230,7 @@
       {
         "id": "note001.zenodo_metadata",
         "status": "PASS",
-        "detail": "payload matches note metadata; no Zenodo deposition yet"
+        "detail": "payload matches note metadata; Zenodo production deposition 22806278 state=draft"
       },
       {
         "id": "note001.license_consistency",
@@ -266,6 +273,11 @@
         "detail": "results/ contains only README.md"
       },
       {
+        "id": "repo.license_display_contract",
+        "status": "PASS",
+        "detail": "granted/pending render+parse round-trips pass; cross-state and missing-row cases rejected"
+      },
+      {
         "id": "repo.internal_links",
         "status": "PASS",
         "detail": "62 relative links resolve (site pages and repository docs)"
@@ -273,15 +285,26 @@
       {
         "id": "repo.secret_scan",
         "status": "PASS",
-        "detail": "70 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
+        "detail": "73 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
       }
     ]
   },
   "blockers": [
     {
+      "item": "canonical_website",
+      "state": "STALE_OR_INCONSISTENT",
+      "http_status": 200,
+      "license_check": {
+        "expected": "CC-BY-4.0 (applies to the note text only)",
+        "observed": "Not yet granted: a license decision is pending, so no reuse rights are granted at this time.",
+        "matches": false
+      },
+      "cause": "The canonical page license text does not match the note's granted/pending license state."
+    },
+    {
       "item": "zenodo_doi",
-      "state": "NOT_STARTED",
-      "cause": "No Zenodo access token has been provided."
+      "state": "DRAFT",
+      "cause": "The Zenodo draft has not been published."
     }
   ]
 }
