@@ -1,9 +1,9 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-17T07:18:50Z",
+  "generated_at": "2026-09-17T06:05:52Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
-  "version": "1.1",
+  "version": "1.0",
   "title": "From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution",
   "status": "COMPLETE",
   "repository": {
@@ -14,48 +14,48 @@
     "immutable_releases_enabled": true,
     "error": null
   },
-  "commit_sha": "c7fd0601a451770a5edde334f036d4865d428812",
+  "commit_sha": "200103f8e3e64e609140d543f5988a363a76683d",
   "release": {
-    "tag": "research-note-001-v1.1",
+    "tag": "research-note-001-v1.0",
     "exists": true,
-    "id": 390480442,
-    "url": "https://github.com/M12-pixel1/margelis-research/releases/tag/research-note-001-v1.1",
+    "id": 390114628,
+    "url": "https://github.com/M12-pixel1/margelis-research/releases/tag/research-note-001-v1.0",
     "name": "Margelis Research Note 001 — From Mandate to Verified Outcome",
     "draft": false,
     "immutable": true,
-    "published_at": "2026-09-17T06:29:58Z",
-    "target_commit": "c7fd0601a451770a5edde334f036d4865d428812",
+    "published_at": "2026-09-16T17:04:13Z",
+    "target_commit": "200103f8e3e64e609140d543f5988a363a76683d",
     "assets": [
       {
         "name": "Margelis_Research_Note_001.md",
-        "size": 12094,
+        "size": 11814,
         "download_status": 200,
-        "sha256": "1833b592b04466433c9fead2333194c502db80edfd03b0f04a847689b30e7371",
-        "github_digest": "sha256:1833b592b04466433c9fead2333194c502db80edfd03b0f04a847689b30e7371",
+        "sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
+        "github_digest": "sha256:c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
         "matches_sha256sums": true
       },
       {
         "name": "Margelis_Research_Note_001.pdf",
-        "size": 252152,
+        "size": 251688,
         "download_status": 200,
-        "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
-        "github_digest": "sha256:e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
+        "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+        "github_digest": "sha256:7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
         "matches_sha256sums": true
       },
       {
         "name": "metadata.json",
-        "size": 8573,
+        "size": 7600,
         "download_status": 200,
-        "sha256": "bb18feef4cb161a80c7583cf564b43571c7cb3055959c650ea23003df0fe7552",
-        "github_digest": "sha256:bb18feef4cb161a80c7583cf564b43571c7cb3055959c650ea23003df0fe7552",
+        "sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
+        "github_digest": "sha256:2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
         "matches_sha256sums": true
       },
       {
         "name": "SHA256SUMS",
         "size": 273,
         "download_status": 200,
-        "sha256": "6ffb3401edc595f54c64c9a56ef4414ec8085e1f95bf07776ab2eb3bca30013d",
-        "github_digest": "sha256:6ffb3401edc595f54c64c9a56ef4414ec8085e1f95bf07776ab2eb3bca30013d",
+        "sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0",
+        "github_digest": "sha256:cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0",
         "matches_sha256sums": true
       }
     ],
@@ -66,16 +66,16 @@
     "status": "LIVE",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-17T07:18:48Z",
+      "checked_at": "2026-09-17T06:05:50Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
-      "url": "https://rupestelisholding.com/research/001/v1.1/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T07:18:49Z",
+      "url": "https://rupestelisholding.com/research/001/v1.0/Margelis_Research_Note_001.pdf",
+      "checked_at": "2026-09-17T06:05:50Z",
       "http_status": 200,
       "content_type": "application/pdf",
-      "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
+      "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
       "sha256_matches": true
     },
     "license_check": {
@@ -89,54 +89,44 @@
     "pages_site": "https://m12-pixel1.github.io/margelis-research/",
     "pages_status": null,
     "pages_error": null,
-    "deployment_id": 6496998775,
-    "deployment_commit": "93b9f12afd4c519dd40d106340af887ea060a538",
+    "deployment_id": 6496646668,
+    "deployment_commit": "f7239b3bc3b73e55432dbe4d03ec038ccc6fa698",
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-17T07:18:47Z",
+      "checked_at": "2026-09-17T06:05:48Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
-      "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.1/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T07:18:47Z",
+      "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.0/Margelis_Research_Note_001.pdf",
+      "checked_at": "2026-09-17T06:05:49Z",
       "http_status": 200,
       "content_type": "application/pdf",
-      "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
+      "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
       "sha256_matches": true
     },
     "verified": true
   },
   "hashes": {
-    "pdf_sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
-    "markdown_sha256": "1833b592b04466433c9fead2333194c502db80edfd03b0f04a847689b30e7371",
-    "metadata_sha256": "bb18feef4cb161a80c7583cf564b43571c7cb3055959c650ea23003df0fe7552",
-    "sha256sums_sha256": "6ffb3401edc595f54c64c9a56ef4414ec8085e1f95bf07776ab2eb3bca30013d"
+    "pdf_sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a",
+    "markdown_sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8",
+    "metadata_sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5",
+    "sha256sums_sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
   },
   "zenodo": {
     "status": "PUBLISHED",
     "environment": "production",
-    "deposition_id": 22806682,
-    "record_id": 22806682,
-    "reserved_doi": "10.5281/zenodo.22806682",
-    "doi": "10.5281/zenodo.22806682",
+    "deposition_id": 22806278,
+    "record_id": 22806278,
+    "reserved_doi": "10.5281/zenodo.22806278",
+    "doi": "10.5281/zenodo.22806278",
     "public_api_status": 200,
-    "record_url": "https://zenodo.org/records/22806682",
-    "files_match": true,
-    "concept_doi": "10.5281/zenodo.22806277"
+    "record_url": "https://zenodo.org/records/22806278",
+    "files_match": true
   },
-  "doi": "10.5281/zenodo.22806682",
-  "concept_doi": "10.5281/zenodo.22806277",
-  "previous_versions": [
-    {
-      "version": "1.0",
-      "release_tag": "research-note-001-v1.0",
-      "doi": "10.5281/zenodo.22806278",
-      "receipt": "receipts/publication-receipt-v1.0.json"
-    }
-  ],
-  "publication_timestamp": "2026-09-17T06:29:58Z",
+  "doi": "10.5281/zenodo.22806278",
+  "publication_timestamp": "2026-09-16T17:04:13Z",
   "license": {
     "status": "granted",
     "spdx": "CC-BY-4.0",
@@ -203,7 +193,7 @@
       {
         "id": "note001.metadata_consistency",
         "status": "PASS",
-        "detail": "metadata.json matches note.yaml, references.json and file digests"
+        "detail": "metadata.json matches note.yaml, references.json and file digests (license as recorded at release)"
       },
       {
         "id": "note001.pdf_opens",
@@ -243,7 +233,7 @@
       {
         "id": "note001.zenodo_metadata",
         "status": "PASS",
-        "detail": "payload matches note metadata; Zenodo production deposition 22806682 state=published"
+        "detail": "payload matches note metadata; Zenodo production deposition 22806278 state=published"
       },
       {
         "id": "note001.license_consistency",
@@ -253,7 +243,7 @@
       {
         "id": "note001.versioning",
         "status": "PASS",
-        "detail": "research-note-001-v1.1 released; working-tree files are byte-identical to the released digests; earlier versions 1.0 intact"
+        "detail": "research-note-001-v1.0 released; working-tree files are byte-identical to the released digests"
       },
       {
         "id": "note001.published_claims",
@@ -268,7 +258,7 @@
       {
         "id": "note001.pdf_reproducible",
         "status": "PASS",
-        "detail": "rebuilt PDF sha256 e57c225251f57c07… == SHA256SUMS e57c225251f57c07…"
+        "detail": "rebuilt PDF sha256 7514290ac9c6ecc6… == SHA256SUMS 7514290ac9c6ecc6…"
       },
       {
         "id": "benchmark.scenarios",
@@ -293,12 +283,12 @@
       {
         "id": "repo.internal_links",
         "status": "PASS",
-        "detail": "63 relative links resolve (site pages and repository docs)"
+        "detail": "62 relative links resolve (site pages and repository docs)"
       },
       {
         "id": "repo.secret_scan",
         "status": "PASS",
-        "detail": "78 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
+        "detail": "73 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
       }
     ]
   },
