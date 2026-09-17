@@ -1,41 +1,45 @@
 {
-  "environment": "production",
-  "version": "1.0",
-  "deposition_id": 22806278,
-  "record_id": 22806278,
-  "concept_record_id": "22806277",
-  "reserved_doi": "10.5281/zenodo.22806278",
-  "state": "published",
-  "draft_url": "https://zenodo.org/deposit/22806278",
-  "access_right": "open",
-  "license": "cc-by-4.0",
-  "files": [
-    {
-      "filename": "Margelis_Research_Note_001.md",
-      "md5": "287a6a7b718afbdbc70cc9855c9ae9b7",
-      "sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8"
-    },
-    {
-      "filename": "Margelis_Research_Note_001.pdf",
-      "md5": "f82bf051823815e708e1fd443499e3cb",
-      "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a"
-    },
-    {
-      "filename": "metadata.json",
-      "md5": "15a0230780a29834d1c721acac4cc58e",
-      "sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5"
-    },
-    {
-      "filename": "SHA256SUMS",
-      "md5": "05618fdb78169f710167e68e8db7f357",
-      "sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
+  "records": {
+    "1.0": {
+      "environment": "production",
+      "version": "1.0",
+      "deposition_id": 22806278,
+      "record_id": 22806278,
+      "concept_record_id": "22806277",
+      "reserved_doi": "10.5281/zenodo.22806278",
+      "state": "published",
+      "draft_url": "https://zenodo.org/deposit/22806278",
+      "access_right": "open",
+      "license": "cc-by-4.0",
+      "files": [
+        {
+          "filename": "Margelis_Research_Note_001.md",
+          "md5": "287a6a7b718afbdbc70cc9855c9ae9b7",
+          "sha256": "c0516ebb24a171d1d7a5f859d14af7709a026bfbc71552bd380c4a431023bad8"
+        },
+        {
+          "filename": "Margelis_Research_Note_001.pdf",
+          "md5": "f82bf051823815e708e1fd443499e3cb",
+          "sha256": "7514290ac9c6ecc66349c4657762cf14aeed5209eb41665b7920273255c03e4a"
+        },
+        {
+          "filename": "metadata.json",
+          "md5": "15a0230780a29834d1c721acac4cc58e",
+          "sha256": "2737e5852dbd723535777dc5ce74341801e81df0678d496884ef6418d17744a5"
+        },
+        {
+          "filename": "SHA256SUMS",
+          "md5": "05618fdb78169f710167e68e8db7f357",
+          "sha256": "cffa34b7bc9069e337b6bf62a581dc4b7a49334f2280eeba0aa74eeb6847eba0"
+        }
+      ],
+      "metadata_matches": true,
+      "checked_at": "2026-09-17T06:01:23Z",
+      "doi": "10.5281/zenodo.22806278",
+      "doi_url": "https://doi.org/10.5281/zenodo.22806278",
+      "record_url": "https://zenodo.org/record/22806278",
+      "concept_doi": "10.5281/zenodo.22806277",
+      "published_at": "2026-09-17T06:01:25Z"
     }
-  ],
-  "metadata_matches": true,
-  "checked_at": "2026-09-17T06:01:23Z",
-  "doi": "10.5281/zenodo.22806278",
-  "doi_url": "https://doi.org/10.5281/zenodo.22806278",
-  "record_url": "https://zenodo.org/record/22806278",
-  "concept_doi": "10.5281/zenodo.22806277",
-  "published_at": "2026-09-17T06:01:25Z"
+  }
 }

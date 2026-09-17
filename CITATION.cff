@@ -30,6 +30,9 @@ identifiers:
 - type: doi
   value: 10.5281/zenodo.22806278
   description: Archived record of Margelis Research Note 001 v1.0
+- type: doi
+  value: 10.5281/zenodo.22806277
+  description: All versions of Margelis Research Note 001 (resolves to the latest)
 license: CC-BY-4.0
 preferred-citation:
   type: report

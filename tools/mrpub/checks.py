@@ -493,15 +493,42 @@ class NoteChecks:
         state = f"granted ({n.license['spdx']})" if n.license_granted else "pending"
         return (FAIL, "; ".join(problems)) if problems else (PASS, f"license {state} consistently in all files")
 
+    def _earlier_versions_intact(self) -> list[str]:
+        """Every earlier version must be released and still served byte-identically under site/.../v<x>/."""
+        n = self.note
+        problems = []
+        for v in n.previous_versions():
+            tag = f"research-note-{n.number}-v{v}"
+            released = git("show", f"{tag}:research/{n.number}/SHA256SUMS", check=False)
+            if not released:
+                problems.append(f"earlier version {v}: tag {tag} missing locally")
+                continue
+            vdir = n.site_dir / f"v{v}"
+            for line in released.splitlines():
+                if not line.strip():
+                    continue
+                digest, name = line.split(maxsplit=1)
+                f = vdir / name.strip()
+                if not f.exists() or sha256_file(f) != digest:
+                    problems.append(f"earlier version {v}: {f.relative_to(ROOT).as_posix()} missing or changed")
+            if not (vdir / "SHA256SUMS").exists() or \
+                    (vdir / "SHA256SUMS").read_text(encoding="utf-8").strip() != released.strip():
+                problems.append(f"earlier version {v}: site SHA256SUMS differs from {tag}")
+        return problems
+
     def c_versioning(self):
         n = self.note
         tag = n.tag
+        earlier = self._earlier_versions_intact()
+        if earlier:
+            return FAIL, "; ".join(earlier)
+        kept = f"; earlier versions {', '.join(n.previous_versions())} intact" if n.previous_versions() else ""
         local = git("tag", "-l", tag, check=False)
         remote = ""
         if self.online:
             remote = git("ls-remote", "--tags", "origin", f"refs/tags/{tag}", check=False)
         if not local and not remote:
-            return PASS, f"{tag} not released yet; artifacts may still change"
+            return PASS, f"{tag} not released yet; artifacts may still change{kept}"
         if not local:
             return FAIL, f"{tag} exists on origin but not locally; run `git fetch --tags` and re-check"
         released = git("show", f"{tag}:research/{n.number}/SHA256SUMS", check=False)
@@ -518,7 +545,7 @@ class NoteChecks:
         if released.strip() != current or changed:
             return FAIL, (f"{tag} is released and the working tree differs from it ({sorted(set(changed)) or 'SHA256SUMS'}). "
                           f"Published versions are never overwritten: add a new version to note.yaml.")
-        return PASS, f"{tag} released; working-tree files are byte-identical to the released digests"
+        return PASS, f"{tag} released; working-tree files are byte-identical to the released digests{kept}"
 
     def _published_files(self) -> list[Path]:
         n = self.note

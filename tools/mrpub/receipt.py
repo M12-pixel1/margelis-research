@@ -152,6 +152,18 @@ def probe_zenodo(note: Note) -> dict:
             remote = {f.get("key"): str(f.get("checksum", "")).removeprefix("md5:")
                       for f in (data.get("files") or [])}
             out["files_match"] = bool(remote) and remote == local
+            out["concept_doi"] = data.get("conceptdoi")
+    return out
+
+
+def previous_versions(note: Note) -> list[dict]:
+    """Earlier versions stay published: their tag, DOI and archived receipt."""
+    out = []
+    for v in note.previous_versions():
+        archived = note.dir / "receipts" / f"publication-receipt-v{v}.json"
+        out.append({"version": v, "release_tag": f"research-note-{note.number}-v{v}",
+                    "doi": note.version_doi(v),
+                    "receipt": archived.relative_to(note.dir).as_posix() if archived.exists() else None})
     return out
 
 
@@ -207,6 +219,8 @@ def generate(note: Note, validations: list[Result]) -> dict:
                    "sha256sums_sha256": sha256_file(note.sums_path)},
         "zenodo": zen,
         "doi": zen.get("doi"),
+        "concept_doi": note.concept_doi(),
+        "previous_versions": previous_versions(note),
         "publication_timestamp": release.get("published_at"),
         "license": {"status": note.license["status"], "spdx": note.license.get("spdx"),
                     "proposed": note.license.get("proposed")},
@@ -219,6 +233,14 @@ def generate(note: Note, validations: list[Result]) -> dict:
 
 
 def write(note: Note, validations: list[Result]) -> dict:
+    # a receipt for an earlier version is kept, not overwritten
+    if note.receipt_path.exists():
+        old = json.loads(note.receipt_path.read_text(encoding="utf-8"))
+        if old.get("version") and old["version"] != note.version:
+            archived = note.dir / "receipts" / f"publication-receipt-v{old['version']}.json"
+            archived.parent.mkdir(exist_ok=True)
+            if not archived.exists():
+                note.receipt_path.replace(archived)
     data = generate(note, validations)
     write_json(note.receipt_path, data)
     return data

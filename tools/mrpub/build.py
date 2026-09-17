@@ -65,6 +65,7 @@ def build_metadata(note: Note, pdf_pages: int | None, pdf_path: Path | None = No
         },
         "references": load_json(note.references_path)["references"],
         "version_history": [{"version": str(h["version"]), "date": str(h["date"]), "summary": h["summary"],
+                             **({"changes": list(h["changes"])} if h.get("changes") else {}),
                              "release_tag": f"research-note-{note.number}-v{h['version']}"}
                             for h in note.meta["version_history"]],
     }

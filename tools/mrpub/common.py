@@ -290,17 +290,37 @@ class Note:
     def license_granted(self) -> bool:
         return license_is_granted(self.license)
 
-    def zenodo_record(self) -> dict | None:
-        if self.zenodo_path.exists():
-            return load_json(self.zenodo_path)
-        return None
+    def zenodo_records(self) -> dict[str, dict]:
+        """version -> Zenodo record. Accepts the single-record layout written before versioning."""
+        if not self.zenodo_path.exists():
+            return {}
+        data = load_json(self.zenodo_path)
+        if "records" in data:
+            return data["records"]
+        return {str(data["version"]): data} if data.get("version") else {}
 
-    def doi(self) -> str | None:
-        """DOI that may be displayed: only once the Zenodo record is published."""
-        rec = self.zenodo_record()
+    def zenodo_record(self, version: str | None = None) -> dict | None:
+        return self.zenodo_records().get(version or self.version)
+
+    def version_doi(self, version: str) -> str | None:
+        """DOI of a version, only once its Zenodo record is published."""
+        rec = self.zenodo_record(version)
         if rec and rec.get("state") == "published" and rec.get("doi"):
             return rec["doi"]
         return None
+
+    def doi(self) -> str | None:
+        return self.version_doi(self.version)
+
+    def concept_doi(self) -> str | None:
+        """DOI that always resolves to the latest published version."""
+        for rec in self.zenodo_records().values():
+            if rec.get("state") == "published" and rec.get("concept_doi"):
+                return rec["concept_doi"]
+        return None
+
+    def previous_versions(self) -> list[str]:
+        return [str(h["version"]) for h in self.meta["version_history"] if str(h["version"]) != self.version]
 
 
 def load_note(number: str) -> Note:

@@ -62,10 +62,17 @@ def build(notes: list[Note]) -> dict:
         "url": latest.canonical_url,
     }
     doi = latest.doi()
+    identifiers = []
     if doi:
         cff["doi"] = doi
-        cff["identifiers"] = [{"type": "doi", "value": doi,
-                               "description": f"Archived record of {latest.series_name} Note {latest.number} v{latest.version}"}]
+        identifiers.append({"type": "doi", "value": doi,
+                            "description": f"Archived record of {latest.series_name} Note {latest.number} v{latest.version}"})
+    concept = latest.concept_doi()
+    if concept and concept != doi:
+        identifiers.append({"type": "doi", "value": concept,
+                            "description": f"All versions of {latest.series_name} Note {latest.number} (resolves to the latest)"})
+    if identifiers:
+        cff["identifiers"] = identifiers
     if latest.license_granted:
         cff["license"] = latest.license["spdx"]
     cff["preferred-citation"] = _reference(latest)

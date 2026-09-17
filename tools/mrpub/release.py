@@ -34,6 +34,19 @@ def notes_markdown(note: Note) -> str:
         "Not yet granted (license decision pending)"
     unproven = note.meta.get("locked_statements", {}).get("What remains unproven", [])
     rows = "\n".join(f"| `{name}` | `{digest}` |" for name, digest in sums.items())
+    concept = note.concept_doi()
+    if concept:
+        doi += f" (all versions: https://doi.org/{concept})"
+    current = next(h for h in note.meta["version_history"] if str(h["version"]) == note.version)
+    history = []
+    for v in note.previous_versions():
+        vdoi = note.version_doi(v)
+        history.append(f"- v{v}: {note.repo_url}/releases/tag/research-note-{note.number}-v{v}"
+                       + (f" · https://doi.org/{vdoi}" if vdoi else "") + " (unchanged, still available)")
+    changes = []
+    if history:
+        changes = ["### Changes in this version", "", *[f"- {c}" for c in (current.get("changes") or [current["summary"]])],
+                   "", "Earlier versions:", "", *history, ""]
     lines = [
         f"**{note.series_name} Note {note.number} — {note.full_title}**",
         "",
@@ -50,6 +63,7 @@ def notes_markdown(note: Note) -> str:
         "",
         " ".join(note.meta["abstract"].split()),
         "",
+        *changes,
         "### Limitations (What remains unproven)",
         "",
         *[f"- {s}" for s in unproven],
@@ -103,7 +117,23 @@ def create(note: Note, dry_run: bool = False) -> dict:
     if not result.get("all_assets_present_and_matching") or result.get("draft"):
         raise PipelineError(f"release verification failed: {result}")
     print(f"Released {tag}: {result['url']} (immutable={result.get('immutable')}); all assets match SHA256SUMS")
+    mark_superseded(note)
     return result
+
+
+def mark_superseded(note: Note) -> None:
+    """Prepend a pointer to the newer version on earlier releases (notes only; tags and assets stay locked)."""
+    for v in note.previous_versions():
+        old_tag = f"research-note-{note.number}-v{v}"
+        body = _gh("release", "view", old_tag, "--repo", note.repo_slug, "--json", "body", "--jq", ".body")
+        marker = f"> **Superseded by version {note.version}:** {note.release_url}"
+        if marker in body:
+            continue
+        with tempfile.TemporaryDirectory() as tmp:
+            notes_file = Path(tmp) / "notes.md"
+            write_text(notes_file, f"{marker}  \n> This version remains available unchanged.\n\n{body}\n")
+            _gh("release", "edit", old_tag, "--repo", note.repo_slug, "--notes-file", str(notes_file))
+        print(f"Marked {old_tag} as superseded by v{note.version}")
 
 
 def update_notes(note: Note) -> None:

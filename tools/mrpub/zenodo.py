@@ -63,7 +63,24 @@ def description_html(note: Note) -> str:
         f"Source and release: <a href=\"{e(note.release_url)}\">{e(note.release_url)}</a>.</p>"
         f"<p>The SHA-256 digests of the files in this record are listed in SHA256SUMS; the same bytes are "
         f"attached to the GitHub release.</p>"
+        + version_changes_html(note)
     )
+
+
+def version_changes_html(note: Note) -> str:
+    """For versions after the first: what changed and which DOI this version supersedes."""
+    e = lambda s: html.escape(str(s), quote=False)  # noqa: E731
+    current = next(h for h in note.meta["version_history"] if str(h["version"]) == note.version)
+    previous = note.previous_versions()
+    if not previous:
+        return ""
+    prev = previous[-1]
+    prev_doi = note.version_doi(prev)
+    changes = current.get("changes") or [current["summary"]]
+    items = "".join(f"<li>{e(c)}</li>" for c in changes)
+    supersedes = f" (DOI {e(prev_doi)})" if prev_doi else ""
+    return (f"<p><strong>Changes in version {e(note.version)}</strong> (supersedes version {e(prev)}{supersedes}; "
+            f"earlier versions remain available unchanged):</p><ul>{items}</ul>")
 
 
 def build_metadata(note: Note) -> dict:
@@ -152,6 +169,26 @@ class Client:
     def publish(self, dep_id: int) -> dict:
         return self._check(self.s.post(f"{self.base}/deposit/depositions/{dep_id}/actions/publish", timeout=120), 202)
 
+    def newversion(self, dep_id: int) -> dict:
+        """Returns the ORIGINAL deposition; the new draft is at links.latest_draft."""
+        return self._check(self.s.post(f"{self.base}/deposit/depositions/{dep_id}/actions/newversion",
+                                       timeout=120), 201)
+
+    def get_url(self, url: str) -> dict:
+        if not url.startswith(self.base + "/"):
+            raise PipelineError(f"refusing to follow a URL outside {self.base}: {url}")
+        return self._check(self.s.get(url, timeout=60), 200)
+
+    def delete_file(self, dep_id: int, file_id: str) -> None:
+        self._check(self.s.delete(f"{self.base}/deposit/depositions/{dep_id}/files/{file_id}", timeout=60), 204)
+
+
+def save_record(note: Note, state: dict) -> None:
+    """zenodo.json keeps one record per version: {"records": {"1.0": {...}, "1.1": {...}}}."""
+    records = dict(note.zenodo_records())
+    records[note.version] = state
+    write_json(note.zenodo_path, {"records": dict(sorted(records.items(), key=lambda kv: [int(x) for x in kv[0].split(".")]))})
+
 
 def compare(expected: dict, remote: dict) -> list[str]:
     diffs = []
@@ -195,12 +232,28 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
         if dep.get("submitted"):
             print(f"Already published: {dep.get('doi')} ({dep['links'].get('html')}). Nothing to do.")
             return 0
+    previous = None
     if dep is None:
-        dep = client.create()
+        published = [(v, r) for v, r in note.zenodo_records().items()
+                     if v != note.version and r.get("environment") == env and r.get("state") == "published"]
+        if published:
+            # a later version of an archived note: new version of the same Zenodo concept
+            previous, prev_rec = max(published, key=lambda vr: [int(x) for x in vr[0].split(".")])
+            original = client.newversion(prev_rec["deposition_id"])
+            dep = client.get_url(original["links"]["latest_draft"])
+        else:
+            dep = client.create()
         # record the draft at once so that a later failure never leaves an untracked deposition
-        write_json(note.zenodo_path, {"environment": env, "version": note.version, "deposition_id": dep["id"],
-                                      "state": "draft-created", "checked_at": utc_now()})
-        print(f"Created draft deposition {dep['id']}")
+        save_record(note, {"environment": env, "version": note.version, "deposition_id": dep["id"],
+                           "previous_version": previous, "state": "draft-created", "checked_at": utc_now()})
+        print(f"Created draft deposition {dep['id']}"
+              + (f" as a new version of v{previous} (deposition {prev_rec['deposition_id']})" if previous else ""))
+        if previous:
+            # the new-version draft starts with a snapshot of the previous files
+            for f in dep.get("files", []):
+                client.delete_file(dep["id"], f["id"])
+                print(f"Removed inherited file {f['filename']}")
+            dep = client.get(dep["id"])
     dep = client.update(dep["id"], metadata)
     reserved = dep["metadata"].get("prereserve_doi", {}).get("doi")
 
@@ -221,9 +274,13 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
     for f in files:
         if remote_files.get(f.name) != md5_file(f):
             diffs.append(f"file {f.name}: missing or checksum differs on Zenodo")
+    extra = sorted(set(remote_files) - {f.name for f in files})
+    if extra:
+        diffs.append(f"unexpected files on Zenodo: {extra}")
     state = {
         "environment": env,
         "version": note.version,
+        "previous_version": (record or {}).get("previous_version", previous),
         "deposition_id": dep["id"],
         "record_id": dep.get("record_id"),
         "concept_record_id": dep.get("conceptrecid"),
@@ -236,7 +293,7 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
         "metadata_matches": not diffs,
         "checked_at": utc_now(),
     }
-    write_json(note.zenodo_path, state)
+    save_record(note, state)
     if diffs:
         raise PipelineError("Zenodo draft does not match local metadata:\n  " + "\n  ".join(diffs))
     print(f"Draft verified. Reserved DOI: {reserved} (not registered until published). Review: {state['draft_url']}")
@@ -258,7 +315,7 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
         "concept_doi": dep.get("conceptdoi"),
         "published_at": utc_now(),
     })
-    write_json(note.zenodo_path, state)
+    save_record(note, state)
     print(f"Published: {state['doi_url']}  state={state['state']}")
     print(f"Next: python tools/publish.py build {note.number} && python tools/publish.py receipt {note.number}")
     return 0 if state["state"] == "published" else 1

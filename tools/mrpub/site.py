@@ -192,7 +192,11 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
     lic = note.license
     license_text = license_display_html(lic)
     doi_html = (f'<a href="https://doi.org/{esc(doi)}">{esc(doi)}</a>' if doi
-                else "Pending: the archival (Zenodo) record has not been published yet.")
+                else "Pending: the archival (Zenodo) record of this version has not been published yet.")
+    concept = note.concept_doi()
+    if concept:
+        doi_html += (f'<br><span class="meta">All versions: <a href="https://doi.org/{esc(concept)}">'
+                     f'{esc(concept)}</a></span>')
     unproven = next((slug for slug, text in toc if "What remains unproven" in text), "")
     archive_clause = (" and to the Zenodo record" if doi
                       else "; the archival (Zenodo) record, once published, carries the same files")
@@ -267,12 +271,19 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
     files_rows = "\n".join(
         f'<tr><td><a href="{esc(ver)}/{esc(name)}">{esc(name)}</a></td><td class="hash">{esc(digest)}</td></tr>'
         for name, digest in sums.items())
-    versions_rows = "\n".join(
-        "<tr><td>{v}</td><td>{d}</td><td>{s}</td><td><a href=\"v{v}/{pdf}\">PDF</a> · "
-        "<a href=\"{repo}/releases/tag/research-note-{num}-v{v}\">release</a></td></tr>".format(
-            v=esc(h["version"]), d=esc(human_date(str(h["date"]))), s=esc(h["summary"]), pdf=esc(pdf_name),
-            repo=esc(note.repo_url), num=esc(note.number))
-        for h in reversed(note.meta["version_history"]))
+    def version_row(h: dict) -> str:
+        v = str(h["version"])
+        vdoi = note.version_doi(v)
+        doi_cell = f'<a href="https://doi.org/{esc(vdoi)}">{esc(vdoi)}</a>' if vdoi else "pending"
+        changes = h.get("changes") or []
+        detail = esc(h["summary"])
+        if changes:
+            detail += "<ul>" + "".join(f"<li>{esc(c)}</li>" for c in changes) + "</ul>"
+        return (f'<tr><td>{esc(v)}</td><td>{esc(human_date(str(h["date"])))}</td><td>{detail}</td>'
+                f'<td><a href="v{esc(v)}/{esc(pdf_name)}">PDF</a> · <a href="{esc(note.repo_url)}/releases/tag/'
+                f'research-note-{esc(note.number)}-v{esc(v)}">release</a></td><td>{doi_cell}</td></tr>')
+
+    versions_rows = "\n".join(version_row(h) for h in reversed(note.meta["version_history"]))
 
     main = f"""<article>
 <p class="kicker">{esc(note.series_name)} · Research Note {esc(note.number)}</p>
@@ -311,7 +322,7 @@ Its limitations are listed under <a href="#{esc(unproven)}">What remains unprove
 <pre><code>{esc(bibtex(note, doi))}</code></pre>
 <h2 id="versions">Version history</h2>
 <div class="table-wrap" role="region" aria-label="Version history" tabindex="0"><table>
-<thead><tr><th scope="col">Version</th><th scope="col">Date</th><th scope="col">Changes</th><th scope="col">Files</th></tr></thead>
+<thead><tr><th scope="col">Version</th><th scope="col">Date</th><th scope="col">Changes</th><th scope="col">Files</th><th scope="col">DOI</th></tr></thead>
 <tbody>
 {versions_rows}
 </tbody></table></div>
