@@ -1,8 +1,10 @@
 # Verified Delegation Benchmark v0.2: Specification (draft)
 
-**Status: draft specification.** This document and the files next to it define
-the *format* of the benchmark. No implementation, fixtures, baseline systems or
-results are published. Nothing here is an industry standard.
+**Status: draft specification with an executable P0 reference harness.** This
+document and the files next to it define the benchmark format. The P0 harness
+exercises three scenarios with deterministic local fixtures and reference
+systems; no production-system or third-party benchmark results are published.
+Nothing here is an industry standard.
 
 The benchmark operationalizes
 [Margelis Research Note 001](../../research/001/Margelis_Research_Note_001.md)
@@ -67,7 +69,7 @@ Each file in `scenarios/` is YAML and validates against
 | --- | --- |
 | `id` | Stable identifier; equals the file name. |
 | `title` | Human-readable name. |
-| `status` | Always `draft` in v0.2 until an implementation exists. |
+| `status` | `draft` in v0.2; an executable self-test does not by itself promote a scenario to stable. |
 | `note_case` | The case name in Research Note 001, section 4. |
 | `invariants` | Invariants the scenario exercises. |
 | `risk_class` | One of the controlled values in the schema. |
@@ -139,10 +141,18 @@ establishes the preconditions, a failure injector, at least one baseline system
 under test, an independent verifier, receipt capture, and a result matrix with
 raw evidence and digests.
 
+The executable P0 reference harness in `harness/` currently covers expired
+mandate, replay and false DONE. It uses deterministic local fixtures and two
+reference systems solely to test that the evaluator rejects known-unsafe
+behavior and accepts the minimal guarded behavior. Its output is marked
+`HARNESS_SELF_TEST_ONLY` and is not written to `results/`.
+
 Per Research Note 001, section 10, **results are published only once an
 independent rerun is possible**: the fixtures, harness, baseline versions and
 raw evidence must be available so that a third party can reproduce the result
-matrix. Until then `results/` stays empty.
+matrix. For an actual system-under-test this also requires an external or
+otherwise independently observable authoritative-state fixture. Until that
+publication rule is met, `results/` stays empty.
 
 ## 9. Versioning
 
