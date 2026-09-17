@@ -1,11 +1,24 @@
 from __future__ import annotations
 
+import ast
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW = ROOT / ".github" / "workflows" / "benchmark-live-github.yml"
 RUNNER = Path(__file__).with_name("github_issues_runner.py")
+
+
+def _output_assignment_source(source: str) -> str | None:
+    """Return the source for the module-level OUTPUT assignment, if present."""
+    tree = ast.parse(source)
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        if any(isinstance(target, ast.Name) and target.id == "OUTPUT" for target in targets):
+            return ast.get_source_segment(source, node)
+    return None
 
 
 def main() -> int:
@@ -29,8 +42,17 @@ def main() -> int:
         failures.append("live runner must keep finally-based issue cleanup")
     if "LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED" not in runner:
         failures.append("live output must remain candidate/not-published")
-    if "benchmark/v0.2/results" in runner:
-        failures.append("live runner must not write benchmark results directly")
+
+    output_assignment = _output_assignment_source(runner)
+    if output_assignment is None:
+        failures.append("live runner must define an explicit OUTPUT evidence target")
+    else:
+        if "VDB_EVIDENCE_PATH" not in output_assignment:
+            failures.append("live evidence target must remain configurable via VDB_EVIDENCE_PATH")
+        if "vdb-live-github-evidence.json" not in output_assignment:
+            failures.append("live evidence default must remain the dedicated evidence JSON file")
+        if "results" in output_assignment.lower():
+            failures.append("live evidence OUTPUT must not target benchmark results")
 
     if failures:
         for failure in failures:
