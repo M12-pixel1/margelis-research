@@ -43,7 +43,6 @@ def http_probe(url: str, expect_sha256: str | None = None) -> dict:
     return out
 
 
-
 def _commit_of_tag(slug: str, tag: str) -> str | None:
     ref, _ = gh_api(f"repos/{slug}/git/ref/tags/{tag}")
     if not ref:
@@ -120,7 +119,7 @@ def probe_canonical(note: Note, pdf_sha: str) -> dict:
     live = transport_live and license_check["matches"]
     if live:
         status = "LIVE"
-    elif transport_live and not license_matches:
+    elif transport_live and not license_check["matches"]:
         status = "STALE_OR_INCONSISTENT"
     else:
         status = "NOT_DEPLOYED"
