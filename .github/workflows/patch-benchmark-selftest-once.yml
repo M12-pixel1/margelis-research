@@ -1,0 +1,42 @@
+name: Patch benchmark validator self-test once
+
+on:
+  push:
+    branches:
+      - benchmark/v0.2-results-github-p0-3-candidate
+    paths:
+      - .vdb-selftest-patch-trigger
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - name: Make validator self-test part of check_benchmark
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('tools/mrpub/checks.py')
+          text = p.read_text(encoding='utf-8')
+          old = '''    from .benchmark_results import validate_results_dir\n    results_ok, results_detail = validate_results_dir(root)\n    out.append(Result("benchmark.result_bundles", PASS if results_ok else FAIL, results_detail))\n    return out\n'''
+          new = '''    from .benchmark_results import validate_results_dir\n    from .benchmark_results_selftest import run_selftest\n    selftest_ok, selftest_detail = run_selftest(root)\n    out.append(Result("benchmark.result_bundle_validator_selftest", PASS if selftest_ok else FAIL, selftest_detail))\n    results_ok, results_detail = validate_results_dir(root)\n    out.append(Result("benchmark.result_bundles", PASS if results_ok else FAIL, results_detail))\n    return out\n'''
+          if text.count(old) != 1:
+              raise SystemExit('expected result-bundle validator block exactly once')
+          p.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+          PY
+          git diff --check
+          grep -q 'benchmark.result_bundle_validator_selftest' tools/mrpub/checks.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/mrpub/checks.py
+          git rm .github/workflows/patch-benchmark-selftest-once.yml .vdb-selftest-patch-trigger
+          git commit -m 'Run benchmark result validator self-tests in publication checks'
+          git push origin HEAD:benchmark/v0.2-results-github-p0-3-candidate
