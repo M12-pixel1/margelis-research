@@ -117,6 +117,32 @@ def check_new_version(note, client):
     return "; ".join(problems)
 
 
+def status_case() -> bool:
+    """zenodo-status must describe this note's depositions and only count unrelated ones."""
+    import contextlib
+    import io
+    note = load_note("001")
+    client = FakeClient()
+    known = next(iter(note.zenodo_records().values()), {}).get("deposition_id")
+    client.list_depositions = lambda: [
+        {"id": known, "title": note.full_title, "state": "done", "submitted": True,
+         "doi": "10.5281/zenodo.1", "metadata": {"title": note.full_title, "version": "1.0"}},
+        {"id": 999, "title": "zelando", "state": "unsubmitted", "submitted": False,
+         "metadata": {"title": "zelando", "prereserve_doi": {"doi": "10.5281/zenodo.999"}}},
+    ]
+    zenodo.Client = lambda env: client
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        code = zenodo.account_status(note)
+    out = buf.getvalue()
+    data = json.loads(out)
+    ok = (code == 0 and "zelando" not in out and "10.5281/zenodo.999" not in out
+          and data["other_depositions_not_inspected"] == 1 and len(data["note_depositions"]) == 1)
+    print(f"{'PASS' if ok else 'FAIL'} zenodo-status hides unrelated drafts: exit={code}, "
+          f"other={data['other_depositions_not_inspected']}, note={len(data['note_depositions'])}")
+    return ok
+
+
 def main() -> int:
     note = load_note("001")
     granted = note.license_granted
@@ -137,6 +163,7 @@ def main() -> int:
             run_case("publish with the reserved DOI", FakeClient(), expect_exit=0,
                      publish=True, confirm_doi="10.5281/zenodo.101"),
         ]
+    results.append(status_case())
     return 0 if all(results) else 1
 
 

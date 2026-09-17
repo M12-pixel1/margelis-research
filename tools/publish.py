@@ -12,6 +12,7 @@ Reversible steps
 
 Publication steps (outward-facing)
   release NNN [--dry-run] [--update-notes]   GitHub release: draft -> assets -> publish -> verify
+  zenodo-status NNN [--sandbox]              read-only: this note's depositions (other drafts only counted)
   zenodo NNN [--sandbox] [--dry-run]         create/verify a private Zenodo draft, reserve the DOI
   zenodo NNN --publish --confirm-doi DOI     publish the draft (irreversible; needs a granted license)
 
@@ -182,6 +183,7 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("zenodo"); s.add_argument("number"); s.add_argument("--sandbox", action="store_true")
     s.add_argument("--dry-run", action="store_true"); s.add_argument("--publish", action="store_true")
     s.add_argument("--confirm-doi")
+    s = sub.add_parser("zenodo-status"); s.add_argument("number"); s.add_argument("--sandbox", action="store_true")
     s = sub.add_parser("grant-license"); s.add_argument("number"); s.add_argument("--spdx", required=True)
     s.add_argument("--by", required=True); s.add_argument("--on", required=True, help="YYYY-MM-DD")
     args = p.parse_args(argv)
@@ -191,6 +193,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_new(args)
         if args.cmd == "grant-license":
             return cmd_grant_license(args)
+        if args.cmd == "zenodo-status":
+            return zenodo.account_status(load_note(args.number), env="sandbox" if args.sandbox else "production")
         if args.cmd == "check":
             return 0 if show(run_checks(args.numbers or all_notes(), args.online)) else 1
         if args.cmd == "check-benchmark":

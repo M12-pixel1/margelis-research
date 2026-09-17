@@ -4,6 +4,7 @@ name: publish-note
 #   check            all checks + PDF rebuild
 #   release-dry-run  print the release that would be created
 #   release          immutable GitHub release (refuses to overwrite an existing tag)
+#   zenodo-status    read-only: this note's depositions on Zenodo (others are only counted)
 #   zenodo-draft     private Zenodo draft with reserved DOI; never publishes
 #   zenodo-publish   publish the existing draft (IRREVERSIBLE); runs only when
 #                    confirm_doi equals the DOI reserved for that draft and the
@@ -18,7 +19,7 @@ on:
         description: Step to run
         type: choice
         default: check
-        options: [check, release-dry-run, release, zenodo-draft, zenodo-publish]
+        options: [check, release-dry-run, release, zenodo-status, zenodo-draft, zenodo-publish]
       confirm_doi:
         description: For zenodo-publish only - the reserved DOI shown by zenodo-draft
         required: false
@@ -51,6 +52,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           DRY_RUN: ${{ inputs.action == 'release-dry-run' && '--dry-run' || '' }}
         run: python tools/publish.py release "$NOTE" $DRY_RUN
+      - name: Zenodo status (read-only)
+        if: inputs.action == 'zenodo-status'
+        env:
+          ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
+        run: python tools/publish.py zenodo-status "$NOTE"
       - name: Zenodo draft (no publication)
         if: inputs.action == 'zenodo-draft'
         env:

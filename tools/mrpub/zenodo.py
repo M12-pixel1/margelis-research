@@ -182,6 +182,45 @@ class Client:
     def delete_file(self, dep_id: int, file_id: str) -> None:
         self._check(self.s.delete(f"{self.base}/deposit/depositions/{dep_id}/files/{file_id}", timeout=60), 204)
 
+    def list_depositions(self) -> list[dict]:
+        out, page = [], 1
+        while True:
+            r = self.s.get(f"{self.base}/deposit/depositions",
+                           params={"page": page, "size": 100, "all_versions": "true"}, timeout=60)
+            batch = self._check(r, 200)
+            out += batch
+            if len(batch) < 100:
+                return out
+            page += 1
+
+
+def account_status(note: Note, env: str = "production") -> int:
+    """Read-only. Workflow logs of a public repository are public, so only depositions that belong
+    to this note are described; any other deposition (e.g. unrelated private drafts) is only counted."""
+    try:
+        client = Client(env)
+    except LookupError:
+        print(token_instructions(note, env))
+        return EXIT_BLOCKED
+    known = {r.get("deposition_id") for r in note.zenodo_records().values()}
+    mine, others = [], 0
+    for d in client.list_depositions():
+        md = d.get("metadata", {})
+        if d.get("id") in known or d.get("title") == note.full_title or md.get("title") == note.full_title:
+            mine.append({"deposition_id": d.get("id"), "state": d.get("state"), "submitted": d.get("submitted"),
+                         "version": md.get("version"), "publication_date": md.get("publication_date"),
+                         "doi": d.get("doi") or None,
+                         "reserved_doi": (md.get("prereserve_doi") or {}).get("doi"),
+                         "tracked_in_zenodo_json": d.get("id") in known})
+        else:
+            others += 1
+    unpublished = [m for m in mine if not m["submitted"]]
+    print(json.dumps({"environment": env, "account_access": "PASS", "note_depositions": mine,
+                      "unpublished_note_drafts": len(unpublished),
+                      "untracked_note_depositions": sum(1 for m in mine if not m["tracked_in_zenodo_json"]),
+                      "other_depositions_not_inspected": others}, indent=2))
+    return 0
+
 
 def save_record(note: Note, state: dict) -> None:
     """zenodo.json keeps one record per version: {"records": {"1.0": {...}, "1.1": {...}}}."""
