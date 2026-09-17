@@ -13,11 +13,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Show Node version
-        run: node --version && npm --version
       - name: Install Stripe CLI
         run: npm install -g @stripe/cli@latest
-      - name: Show Stripe CLI version and anonymous sandbox help
+      - name: Show Stripe CLI syntax only
         run: |
           stripe --version
           stripe sandbox create --help
+          stripe payment_intents create --help
+          stripe payment_intents retrieve --help
