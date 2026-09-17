@@ -3,8 +3,8 @@
 cff-version: 1.2.0
 message: If you refer to this work, please cite it using the preferred citation below.
 title: 'From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution'
-version: '1.0'
-date-released: 2026-09-16
+version: '1.1'
+date-released: 2026-09-17
 abstract: A technical evaluation framework for testing whether consequential autonomous-agent execution
   remains continuously bound to an accountable human or institutional mandate through runtime authorization,
   execution, external state change, independent verification and outcome receipt.
@@ -25,11 +25,7 @@ keywords:
 - benchmarking
 repository-code: https://github.com/M12-pixel1/margelis-research
 url: https://rupestelisholding.com/research/001/
-doi: 10.5281/zenodo.22806278
 identifiers:
-- type: doi
-  value: 10.5281/zenodo.22806278
-  description: Archived record of Margelis Research Note 001 v1.0
 - type: doi
   value: 10.5281/zenodo.22806277
   description: All versions of Margelis Research Note 001 (resolves to the latest)
@@ -45,12 +41,11 @@ preferred-citation:
     name: Rūpestėlis Holding
   collection-title: Margelis Research
   number: '001'
-  version: '1.0'
-  date-published: 2026-09-16
+  version: '1.1'
+  date-published: 2026-09-17
   year: 2026
   month: 9
   url: https://rupestelisholding.com/research/001/
   repository-code: https://github.com/M12-pixel1/margelis-research
-  notes: 'Margelis Research Note 001, version 1.0. Status: Concept + Evaluation Framework.'
-  doi: 10.5281/zenodo.22806278
+  notes: 'Margelis Research Note 001, version 1.1. Status: Concept + Evaluation Framework.'
   license: CC-BY-4.0

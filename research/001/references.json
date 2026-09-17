@@ -1,6 +1,6 @@
 {
   "note": "001",
-  "checked_on": "2026-09-16",
+  "checked_on": "2026-09-17",
   "method": "Bibliographic data was read from the source itself (arXiv API, IETF Datatracker API and draft text, OpenID Foundation specification page, project websites). Every url below must resolve; this is re-checked by `python tools/publish.py check 001 --online`.",
   "references": [
     {
