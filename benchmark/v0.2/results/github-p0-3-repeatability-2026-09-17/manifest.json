@@ -1,7 +1,6 @@
 {
-  "status": "CANDIDATE_ARCHIVED_AFTER_PUBLICATION",
+  "status": "PUBLISHED_RESULT",
   "benchmark": "Verified Delegation Benchmark v0.2",
-  "candidate_id": "github-p0-3-repeatability-2026-09-17",
   "external_system_of_record": {
     "provider": "GitHub",
     "surface": "Issues REST API",
@@ -111,5 +110,6 @@
     "The candidate contains two independent live runs only.",
     "No customer, production, or personal operational data is used."
   ],
-  "published_result_path": "benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17"
+  "result_id": "github-p0-3-repeatability-2026-09-17",
+  "published_on": "2026-09-17"
 }

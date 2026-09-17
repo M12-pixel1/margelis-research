@@ -1,6 +1,6 @@
-# Verified Delegation Benchmark v0.2 — GitHub P0-3 repeatability candidate
+# Verified Delegation Benchmark v0.2 — GitHub P0-3 repeatability result
 
-**Status: ARCHIVED CANDIDATE AFTER PUBLICATION.** Human Gate was approved on 2026-09-17. The published result is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
+**Status: PUBLISHED_RESULT.** This is a published Verified Delegation Benchmark v0.2 result bundle for the bounded GitHub Issues P0-3 experiment. It is not an industry-wide benchmark claim and does not establish generalization beyond the stated system and scenarios.
 
 The candidate records two independent live executions of the same three P0 scenarios against GitHub Issues as an externally observable system of record. The systems under test are benchmark-defined unsafe and guarded reference behaviors; they are not a commercial autonomous-agent product.
 
@@ -38,8 +38,10 @@ The original blanket `benchmark.no_results_published` rule has been replaced in 
 
 The validator self-test is itself part of `publish.py check/verify`. Required CI run `35239083005` completed successfully with **31 PASS, 0 FAIL, 0 WARN, 0 SKIP**. It proved that a complete synthetic bundle is accepted while tampered evidence, scenario-hash drift, missing evidence and an unready bundle are rejected.
 
-`benchmark/v0.2/results/` remains unchanged and still contains only its README. No benchmark result has been published by this candidate PR.
+This validated bundle is published at `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/` with its durable raw evidence and provenance.
 
-## Publication outcome
+## Publication decision
 
-Human Gate approved publication on 2026-09-17. This candidate is retained as the pre-publication audit package. The authoritative published bundle is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
+Human Gate approved by Tomas Margelis on 2026-09-17 after two independent live runs, durable raw-evidence archival, deterministic result-bundle validation, negative validator tests and required green CI.
+
+The limitations above remain part of the published result and must travel with any citation or comparison.
