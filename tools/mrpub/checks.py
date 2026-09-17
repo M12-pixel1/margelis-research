@@ -20,7 +20,8 @@ import yaml
 from pypdf import PdfReader
 
 from . import citation, mdparse, secretscan, zenodo
-from .common import (BENCHMARK, ROOT, SCHEMAS, SITE, Note, PipelineError, all_notes, git, human_date,
+from .common import (BENCHMARK, ROOT, SCHEMAS, SITE, Note, PipelineError, all_notes,
+                     canonical_license_check, git, human_date, license_display_html,
                      load_json, load_note, load_yaml, parse_sums, sha256_file, strip_number)
 
 PASS, FAIL, WARN, SKIP = "PASS", "FAIL", "WARN", "SKIP"
@@ -562,6 +563,40 @@ class NoteChecks:
 
 
 # =========================================================================== repository checks
+def check_license_display_contract() -> Result:
+    """Pin the shared License-row renderer/parser contract for granted and pending states."""
+    granted = {
+        "status": "granted", "spdx": "CC-BY-4.0",
+        "authorized_by": "Test Principal", "authorized_on": "2026-09-17",
+    }
+    pending = {
+        "status": "pending", "spdx": None,
+        "authorized_by": None, "authorized_on": None,
+    }
+
+    def page(meta: dict) -> str:
+        return f"<dl><dt>License</dt><dd>{license_display_html(meta)}</dd></dl>"
+
+    problems = []
+    for label, meta in (("granted", granted), ("pending", pending)):
+        result = canonical_license_check(page(meta), meta)
+        if not result["matches"]:
+            problems.append(f"{label} round-trip mismatch: {result}")
+
+    if canonical_license_check(page(granted), pending)["matches"]:
+        problems.append("granted HTML incorrectly accepted as pending")
+    if canonical_license_check(page(pending), granted)["matches"]:
+        problems.append("pending HTML incorrectly accepted as granted")
+
+    missing = canonical_license_check("<html><body>No license row</body></html>", granted)
+    if missing["matches"] or missing["observed"] is not None:
+        problems.append(f"missing License row not rejected: {missing}")
+
+    return Result("repo.license_display_contract", FAIL if problems else PASS,
+                  "; ".join(problems) if problems else
+                  "granted/pending render+parse round-trips pass; cross-state and missing-row cases rejected")
+
+
 def check_benchmark() -> list[Result]:
     out = []
     root = BENCHMARK / "v0.2"
