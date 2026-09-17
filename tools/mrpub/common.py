@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import datetime as dt
 import hashlib
+import html as html_lib
 import json
 import re
 import subprocess
@@ -92,6 +93,47 @@ def slugify(text: str) -> str:
 def strip_number(heading: str) -> str:
     """'9. What remains unproven' -> 'What remains unproven'."""
     return re.sub(r"^\d+(\.\d+)*\.?\s+", "", heading.strip())
+
+
+
+LICENSE_PENDING_TEXT = "Not yet granted: a license decision is pending, so no reuse rights are granted at this time."
+LICENSE_SCOPE_TEXT = "(applies to the note text only)"
+
+
+def license_is_granted(license_meta: dict) -> bool:
+    return license_meta.get("status") == "granted" and bool(license_meta.get("spdx")) \
+        and bool(license_meta.get("authorized_by")) and bool(license_meta.get("authorized_on"))
+
+
+def license_display_text(license_meta: dict) -> str:
+    """Canonical human-visible license wording used by both rendering and verification."""
+    if license_is_granted(license_meta):
+        return f"{license_meta['spdx']} {LICENSE_SCOPE_TEXT}"
+    return LICENSE_PENDING_TEXT
+
+
+def license_display_html(license_meta: dict) -> str:
+    """Canonical HTML for the human-visible License row."""
+    if not license_is_granted(license_meta):
+        return html_lib.escape(LICENSE_PENDING_TEXT)
+    spdx = str(license_meta["spdx"])
+    href = f"https://spdx.org/licenses/{html_lib.escape(spdx, quote=True)}.html"
+    return f'<a href="{href}">{html_lib.escape(spdx)}</a> {html_lib.escape(LICENSE_SCOPE_TEXT)}'
+
+
+def extract_license_text(body: str) -> str | None:
+    """Extract and normalize the human-visible License row from a generated note page."""
+    match = re.search(r"<dt>\s*License\s*</dt>\s*<dd>(.*?)</dd>", body, flags=re.I | re.S)
+    if not match:
+        return None
+    plain = re.sub(r"<[^>]+>", " ", match.group(1))
+    return " ".join(html_lib.unescape(plain).split())
+
+
+def canonical_license_check(body: str, license_meta: dict) -> dict:
+    expected = license_display_text(license_meta)
+    observed = extract_license_text(body)
+    return {"expected": expected, "observed": observed, "matches": observed == expected}
 
 
 def git(*args: str, check: bool = True) -> str:
@@ -246,9 +288,7 @@ class Note:
 
     @property
     def license_granted(self) -> bool:
-        lic = self.license
-        return lic.get("status") == "granted" and bool(lic.get("spdx")) \
-            and bool(lic.get("authorized_by")) and bool(lic.get("authorized_on"))
+        return license_is_granted(self.license)
 
     def zenodo_record(self) -> dict | None:
         if self.zenodo_path.exists():

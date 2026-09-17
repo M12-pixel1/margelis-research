@@ -10,7 +10,7 @@ import subprocess
 import requests
 
 from .checks import UA, Result
-from .common import Note, parse_sums, sha256_bytes, sha256_file, utc_now, write_json
+from .common import Note, canonical_license_check, parse_sums, sha256_bytes, sha256_file, utc_now, write_json
 
 ZENODO_PUBLIC = {"production": "https://zenodo.org/api/records/", "sandbox": "https://sandbox.zenodo.org/api/records/"}
 
@@ -22,17 +22,22 @@ def gh_api(path: str):
     return json.loads(r.stdout or "null"), None
 
 
-def http_probe(url: str, expect_sha256: str | None = None) -> dict:
+def _http_get(url: str) -> tuple[dict, requests.Response | None]:
     out = {"url": url, "checked_at": utc_now()}
     try:
         r = requests.get(url, headers=UA, timeout=45, allow_redirects=True)
     except requests.RequestException as exc:
         out.update(http_status=None, error=type(exc).__name__)
-        return out
+        return out, None
     out.update(http_status=r.status_code, content_type=r.headers.get("content-type"))
     if r.url != url:
         out["final_url"] = r.url
-    if expect_sha256 is not None and r.status_code == 200:
+    return out, r
+
+
+def http_probe(url: str, expect_sha256: str | None = None) -> dict:
+    out, r = _http_get(url)
+    if expect_sha256 is not None and r is not None and r.status_code == 200:
         out["sha256"] = sha256_bytes(r.content)
         out["sha256_matches"] = out["sha256"] == expect_sha256
     return out
@@ -105,10 +110,27 @@ def probe_pages(note: Note, pdf_sha: str) -> dict:
 
 
 def probe_canonical(note: Note, pdf_sha: str) -> dict:
-    page = http_probe(note.canonical_url)
+    page, response = _http_get(note.canonical_url)
     pdf = http_probe(note.pdf_url, pdf_sha)
-    live = page.get("http_status") == 200 and bool(pdf.get("sha256_matches"))
-    return {"url": note.canonical_url, "status": "LIVE" if live else "NOT_DEPLOYED", "page": page, "pdf": pdf}
+
+    license_check = canonical_license_check(response.text if response is not None else "", note.license)
+
+    transport_live = page.get("http_status") == 200 and bool(pdf.get("sha256_matches"))
+    live = transport_live and license_check["matches"]
+    if live:
+        status = "LIVE"
+    elif transport_live and not license_check["matches"]:
+        status = "STALE_OR_INCONSISTENT"
+    else:
+        status = "NOT_DEPLOYED"
+
+    return {
+        "url": note.canonical_url,
+        "status": status,
+        "page": page,
+        "pdf": pdf,
+        "license_check": license_check,
+    }
 
 
 def probe_zenodo(note: Note) -> dict:
@@ -145,9 +167,13 @@ def generate(note: Note, validations: list[Result]) -> dict:
 
     blockers = []
     if canonical["status"] != "LIVE":
+        cause = ("The canonical page license text does not match the note's granted/pending license state."
+                 if canonical["status"] == "STALE_OR_INCONSISTENT"
+                 else "The research pages are not yet deployed to the canonical host.")
         blockers.append({"item": "canonical_website", "state": canonical["status"],
                          "http_status": canonical["page"].get("http_status"),
-                         "cause": "The research pages are not yet deployed to the canonical host."})
+                         "license_check": canonical.get("license_check"),
+                         "cause": cause})
     if zen["status"] != "PUBLISHED":
         blockers.append({"item": "zenodo_doi", "state": zen["status"],
                          "cause": "No Zenodo access token has been provided." if zen["status"] == "NOT_STARTED"

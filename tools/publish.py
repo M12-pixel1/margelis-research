@@ -55,6 +55,7 @@ def run_checks(numbers: list[str], online: bool, rebuild: bool = False) -> list[
         elif rebuild:
             results.append(checks.check_reproducible(note))
     results += checks.check_benchmark()
+    results.append(checks.check_license_display_contract())
     results.append(checks.check_internal_links())
     results.append(checks.check_secrets())
     return results

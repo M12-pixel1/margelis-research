@@ -7,7 +7,7 @@ from pathlib import Path
 from string import Template
 
 from . import mdparse
-from .common import FONTS, Note, human_date, slugify, write_text
+from .common import FONTS, Note, human_date, license_display_html, slugify, write_text
 
 CSS = """
 :root{
@@ -190,9 +190,7 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
     pdf_file = next(f for f in metadata["files"] if f["path"] == pdf_name)
     og_url = f"{note.canonical_url}{note.og_image_name}"
     lic = note.license
-    license_text = (f'<a href="https://spdx.org/licenses/{esc(lic["spdx"])}.html">{esc(lic["spdx"])}</a> '
-                    f'(applies to the note text only)') if note.license_granted else \
-        "Not yet granted: a license decision is pending, so no reuse rights are granted at this time."
+    license_text = license_display_html(lic)
     doi_html = (f'<a href="https://doi.org/{esc(doi)}">{esc(doi)}</a>' if doi
                 else "Pending: the archival (Zenodo) record has not been published yet.")
     unproven = next((slug for slug, text in toc if "What remains unproven" in text), "")
