@@ -51,8 +51,8 @@ jobs:
         env:
           ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
         run: python tools/publish.py zenodo "$NOTE"
-      - name: Keep Zenodo draft record
-        if: inputs.action == 'zenodo-draft'
+      - name: Keep Zenodo draft record (also after a partial failure)
+        if: always() && inputs.action == 'zenodo-draft'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
           name: zenodo-${{ inputs.note }}
