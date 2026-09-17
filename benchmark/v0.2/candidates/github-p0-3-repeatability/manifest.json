@@ -31,6 +31,7 @@
       "artifact_id": 10495072219,
       "artifact_zip_sha256": "f99db90abe22cd7699ed732cec30fd16439818beb49ec9eed166f8ab71575fde",
       "raw_evidence_json_sha256": "0464389ac5752676ea942ed83793697a27667c61fed95a92cd30b931bc22b65c",
+      "durable_evidence_path": "evidence/run-35216991313.json",
       "artifact_expires_at": "2026-12-16T11:41:10Z"
     },
     {
@@ -44,6 +45,7 @@
       "artifact_id": 10501122580,
       "artifact_zip_sha256": "bf32fd188aa105390e478414f6fca0c2794aee7c24026459b9f5aed71c64fbf8",
       "raw_evidence_json_sha256": "4ae11eb56ac7997265c4c31eef0cc47d9cca8a5e2a30a5f67b9fa0dc612d3ee2",
+      "durable_evidence_path": "evidence/run-35231849182.json",
       "artifact_expires_at": "2026-12-16T14:10:48Z"
     }
   ],
@@ -62,12 +64,17 @@
     {"scenario": "replay", "unsafe": "FAIL", "guarded": "PASS", "runs_agree": true},
     {"scenario": "false_done", "unsafe": "FAIL", "guarded": "PASS", "runs_agree": true}
   ],
+  "result_bundle_validator": {
+    "path": "tools/mrpub/benchmark_results.py",
+    "selftest_check_id": "benchmark.result_bundle_validator_selftest",
+    "bundle_check_id": "benchmark.result_bundles",
+    "validated_ci_run": 35239083005,
+    "validated_ci_conclusion": "success"
+  },
   "publication_readiness": {
-    "ready": false,
-    "blockers": [
-      "Raw evidence JSON is currently retained as expiring GitHub Actions artifacts rather than durable repository evidence.",
-      "No result-bundle validator has yet replaced the deliberate benchmark.no_results_published gate for benchmark/v0.2/results/."
-    ]
+    "ready": true,
+    "blockers": [],
+    "human_gate": "PENDING"
   },
   "limitations": [
     "The systems under test are benchmark-defined unsafe and guarded reference behaviors, not a commercial autonomous-agent product.",
