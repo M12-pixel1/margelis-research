@@ -112,7 +112,9 @@ def build_note(note: Note) -> dict:
     vdir.mkdir(parents=True, exist_ok=True)
     for f in (note.md_path, note.pdf_path, note.metadata_path, note.sums_path):
         shutil.copyfile(f, vdir / f.name)
-    site.render_og_image(note, note.site_dir / note.og_image_name)
+    og = note.site_dir / note.og_image_name
+    if not og.exists():  # per-version card; re-rendering elsewhere only changes anti-aliasing bytes
+        site.render_og_image(note, og)
     return {"note": note.number, "version": note.version, "pages": info["pages"], "sha256": sums}
 
 
