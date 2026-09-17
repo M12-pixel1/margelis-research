@@ -40,6 +40,43 @@
       "record_url": "https://zenodo.org/record/22806278",
       "concept_doi": "10.5281/zenodo.22806277",
       "published_at": "2026-09-17T06:01:25Z"
+    },
+    "1.1": {
+      "environment": "production",
+      "version": "1.1",
+      "previous_version": "1.0",
+      "deposition_id": 22806682,
+      "record_id": 22806682,
+      "concept_record_id": "22806277",
+      "reserved_doi": "10.5281/zenodo.22806682",
+      "state": "draft",
+      "draft_url": "https://zenodo.org/deposit/22806682",
+      "access_right": "open",
+      "license": "cc-by-4.0",
+      "files": [
+        {
+          "filename": "Margelis_Research_Note_001.md",
+          "md5": "88d20725457a959d734abdd949df2921",
+          "sha256": "1833b592b04466433c9fead2333194c502db80edfd03b0f04a847689b30e7371"
+        },
+        {
+          "filename": "Margelis_Research_Note_001.pdf",
+          "md5": "b64fb867be035a2a598dddacdb5cb135",
+          "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58"
+        },
+        {
+          "filename": "metadata.json",
+          "md5": "6c34b8cb3e98496ad372ef14864329ce",
+          "sha256": "bb18feef4cb161a80c7583cf564b43571c7cb3055959c650ea23003df0fe7552"
+        },
+        {
+          "filename": "SHA256SUMS",
+          "md5": "1863ca717b654bc4d5a9462f9028bdaf",
+          "sha256": "6ffb3401edc595f54c64c9a56ef4414ec8085e1f95bf07776ab2eb3bca30013d"
+        }
+      ],
+      "metadata_matches": true,
+      "checked_at": "2026-09-17T06:25:39Z"
     }
   }
 }
