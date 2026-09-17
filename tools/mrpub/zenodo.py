@@ -159,8 +159,10 @@ def compare(expected: dict, remote: dict) -> list[str]:
                 "language", "keywords"):
         if key in expected and remote.get(key) != expected[key]:
             diffs.append(f"{key}: expected {expected[key]!r}, Zenodo has {remote.get(key)!r}")
-    if expected.get("license") and (remote.get("license") or {}) != expected["license"] \
-            and str(remote.get("license", "")).lower() != expected["license"]:
+    remote_license = remote.get("license")
+    if isinstance(remote_license, dict):  # the API may return {"id": "cc-by-4.0", ...}
+        remote_license = remote_license.get("id")
+    if expected.get("license") and str(remote_license or "").lower() != expected["license"]:
         diffs.append(f"license: expected {expected['license']!r}, Zenodo has {remote.get('license')!r}")
     exp_creators = [(c["name"], c.get("affiliation")) for c in expected["creators"]]
     rem_creators = [(c.get("name"), c.get("affiliation")) for c in remote.get("creators", [])]
@@ -195,6 +197,9 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
             return 0
     if dep is None:
         dep = client.create()
+        # record the draft at once so that a later failure never leaves an untracked deposition
+        write_json(note.zenodo_path, {"environment": env, "version": note.version, "deposition_id": dep["id"],
+                                      "state": "draft-created", "checked_at": utc_now()})
         print(f"Created draft deposition {dep['id']}")
     dep = client.update(dep["id"], metadata)
     reserved = dep["metadata"].get("prereserve_doi", {}).get("doi")
