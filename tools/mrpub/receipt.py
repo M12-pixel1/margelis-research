@@ -4,15 +4,13 @@ Nothing is copied from local state files without re-checking it against the exte
 """
 from __future__ import annotations
 
-import html as html_lib
 import json
-import re
 import subprocess
 
 import requests
 
 from .checks import UA, Result
-from .common import Note, parse_sums, sha256_bytes, sha256_file, utc_now, write_json
+from .common import Note, canonical_license_check, parse_sums, sha256_bytes, sha256_file, utc_now, write_json
 
 ZENODO_PUBLIC = {"production": "https://zenodo.org/api/records/", "sandbox": "https://sandbox.zenodo.org/api/records/"}
 
@@ -44,20 +42,6 @@ def http_probe(url: str, expect_sha256: str | None = None) -> dict:
         out["sha256_matches"] = out["sha256"] == expect_sha256
     return out
 
-
-def _canonical_license_text(body: str) -> str | None:
-    """Extract the human-visible License row from a generated note page."""
-    match = re.search(r"<dt>\s*License\s*</dt>\s*<dd>(.*?)</dd>", body, flags=re.I | re.S)
-    if not match:
-        return None
-    plain = re.sub(r"<[^>]+>", " ", match.group(1))
-    return " ".join(html_lib.unescape(plain).split())
-
-
-def _expected_license_text(note: Note) -> str:
-    if note.license_granted:
-        return f"{note.license['spdx']} (applies to the note text only)"
-    return "Not yet granted: a license decision is pending, so no reuse rights are granted at this time."
 
 
 def _commit_of_tag(slug: str, tag: str) -> str | None:
@@ -130,14 +114,10 @@ def probe_canonical(note: Note, pdf_sha: str) -> dict:
     page, response = _http_get(note.canonical_url)
     pdf = http_probe(note.pdf_url, pdf_sha)
 
-    expected_license = _expected_license_text(note)
-    observed_license = None
-    if response is not None and response.status_code == 200:
-        observed_license = _canonical_license_text(response.text)
-    license_matches = observed_license == expected_license
+    license_check = canonical_license_check(response.text if response is not None else "", note.license)
 
     transport_live = page.get("http_status") == 200 and bool(pdf.get("sha256_matches"))
-    live = transport_live and license_matches
+    live = transport_live and license_check["matches"]
     if live:
         status = "LIVE"
     elif transport_live and not license_matches:
@@ -150,11 +130,7 @@ def probe_canonical(note: Note, pdf_sha: str) -> dict:
         "status": status,
         "page": page,
         "pdf": pdf,
-        "license_check": {
-            "expected": expected_license,
-            "observed": observed_license,
-            "matches": license_matches,
-        },
+        "license_check": license_check,
     }
 
 
