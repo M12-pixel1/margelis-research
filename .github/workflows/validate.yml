@@ -30,6 +30,8 @@ jobs:
         run: python benchmark/v0.2/harness/runner.py
       - name: Verified Delegation Benchmark P0 process sandbox
         run: python benchmark/v0.2/sandbox/runner.py
+      - name: Benchmark result bundle validator tests
+        run: python tools/test_benchmark_results.py
       - name: Live GitHub benchmark workflow policy
         run: |
           python -m py_compile benchmark/v0.2/live/github_issues_runner.py
