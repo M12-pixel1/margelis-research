@@ -691,6 +691,9 @@ def check_benchmark() -> list[Result]:
                       f"{len(examples)} synthetic examples valid; {len(negatives)} invalid mutations rejected"))
 
     from .benchmark_results import validate_results_dir
+    from .benchmark_results_selftest import run_selftest
+    selftest_ok, selftest_detail = run_selftest(root)
+    out.append(Result("benchmark.result_bundle_validator_selftest", PASS if selftest_ok else FAIL, selftest_detail))
     results_ok, results_detail = validate_results_dir(root)
     out.append(Result("benchmark.result_bundles", PASS if results_ok else FAIL, results_detail))
     return out
