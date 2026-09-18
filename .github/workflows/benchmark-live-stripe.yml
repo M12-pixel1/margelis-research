@@ -1,0 +1,43 @@
+name: Verified Delegation Benchmark live Stripe sandbox
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type RUN_STRIPE_P0_4A to run simulated payments in the dedicated Stripe sandbox"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vdb-live-stripe-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  live-stripe-sandbox:
+    if: ${{ inputs.confirm == 'RUN_STRIPE_P0_4A' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.14"
+      - name: Install pinned validation dependencies
+        run: python -m pip install -r tools/requirements.txt
+      - name: Run Stripe sandbox P0-4A candidate
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_VDB_SANDBOX_SECRET_KEY }}
+          VDB_EVIDENCE_PATH: vdb-live-stripe-evidence.json
+        run: python benchmark/v0.2/live/stripe_payment_runner.py
+      - name: Upload evidence bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: vdb-live-stripe-${{ github.run_id }}
+          path: vdb-live-stripe-evidence.json
+          if-no-files-found: error
+          retention-days: 90
