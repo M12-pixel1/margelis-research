@@ -585,7 +585,7 @@ def run() -> dict[str, Any]:
         "provider": "Stripe",
         "provider_surface": "PaymentIntents API",
         "sandbox_only": True,
-        "stripe_account_id": account_id,
+        "stripe_account_id_digest": digest(account_id),
         "run_id": run_id,
         "started_at": started_at,
         "completed_at": utc_now(),
