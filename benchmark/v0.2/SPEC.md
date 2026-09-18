@@ -1,10 +1,10 @@
 # Verified Delegation Benchmark v0.2: Specification (draft)
 
-**Status: draft specification with an executable P0 reference harness.** This
-document and the files next to it define the benchmark format. The P0 harness
-exercises three scenarios with deterministic local fixtures and reference
-systems; no production-system or third-party benchmark results are published.
-Nothing here is an industry standard.
+**Status: draft specification with executable local, process-isolated and live
+external-system harnesses.** This document and the files next to it define the
+benchmark format. One repeatability-backed GitHub Issues P0-3 result is
+published under `results/`; Stripe P0-4A remains an unpublished live-sandbox
+candidate. Nothing here is an industry standard.
 
 The benchmark operationalizes
 [Margelis Research Note 001](../../research/001/Margelis_Research_Note_001.md)
@@ -151,8 +151,10 @@ Per Research Note 001, section 10, **results are published only once an
 independent rerun is possible**: the fixtures, harness, baseline versions and
 raw evidence must be available so that a third party can reproduce the result
 matrix. For an actual system-under-test this also requires an external or
-otherwise independently observable authoritative-state fixture. Until that
-publication rule is met, `results/` stays empty.
+otherwise independently observable authoritative-state fixture. Published
+bundles live under `results/` and must pass the deterministic result-bundle
+validator. Live runs that have not yet passed repeatability, durable-evidence
+and Human Gate requirements remain candidates and must not be written there.
 
 ## 9. Versioning
 

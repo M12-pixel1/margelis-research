@@ -5,12 +5,13 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
-WORKFLOW = ROOT / ".github" / "workflows" / "benchmark-live-github.yml"
-RUNNER = Path(__file__).with_name("github_issues_runner.py")
+GITHUB_WORKFLOW = ROOT / ".github" / "workflows" / "benchmark-live-github.yml"
+GITHUB_RUNNER = Path(__file__).with_name("github_issues_runner.py")
+STRIPE_WORKFLOW = ROOT / ".github" / "workflows" / "benchmark-live-stripe.yml"
+STRIPE_RUNNER = Path(__file__).with_name("stripe_payment_runner.py")
 
 
 def _output_assignment_source(source: str) -> str | None:
-    """Return the source for the module-level OUTPUT assignment, if present."""
     tree = ast.parse(source)
     for node in tree.body:
         if not isinstance(node, (ast.Assign, ast.AnnAssign)):
@@ -21,44 +22,88 @@ def _output_assignment_source(source: str) -> str | None:
     return None
 
 
+def _manual_only(workflow: str, label: str, failures: list[str]) -> None:
+    if "workflow_dispatch:" not in workflow:
+        failures.append(f"{label} workflow must require workflow_dispatch")
+    for trigger in ("push", "pull_request", "schedule"):
+        if re.search(rf"(?m)^\s*{trigger}:\s*$", workflow):
+            failures.append(f"{label} workflow must not run on {trigger}")
+
+
 def main() -> int:
-    workflow = WORKFLOW.read_text()
-    runner = RUNNER.read_text()
+    github_workflow = GITHUB_WORKFLOW.read_text()
+    github_runner = GITHUB_RUNNER.read_text()
+    stripe_workflow = STRIPE_WORKFLOW.read_text()
+    stripe_runner = STRIPE_RUNNER.read_text()
     failures: list[str] = []
 
-    if "workflow_dispatch:" not in workflow:
-        failures.append("live workflow must require workflow_dispatch")
-    if re.search(r"(?m)^\s*push:\s*$", workflow):
-        failures.append("live workflow must not run on push")
-    if re.search(r"(?m)^\s*pull_request:\s*$", workflow):
-        failures.append("live workflow must not run on pull_request")
-    if "inputs.confirm == 'RUN_LIVE_GITHUB_P0_3'" not in workflow:
-        failures.append("live workflow must retain explicit human confirmation gate")
-    if "contents: read" not in workflow or "issues: write" not in workflow:
-        failures.append("live workflow permissions must stay contents:read + issues:write")
-    if "contents: write" in workflow:
-        failures.append("live workflow must not have contents:write")
-    if "finally:" not in runner or "state=\"closed\"" not in runner:
-        failures.append("live runner must keep finally-based issue cleanup")
-    if "LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED" not in runner:
-        failures.append("live output must remain candidate/not-published")
+    # Existing GitHub P0-3 live boundary.
+    _manual_only(github_workflow, "GitHub live", failures)
+    if "inputs.confirm == 'RUN_LIVE_GITHUB_P0_3'" not in github_workflow:
+        failures.append("GitHub live workflow must retain explicit human confirmation gate")
+    if "contents: read" not in github_workflow or "issues: write" not in github_workflow:
+        failures.append("GitHub live permissions must stay contents:read + issues:write")
+    if "contents: write" in github_workflow:
+        failures.append("GitHub live workflow must not have contents:write")
+    if "finally:" not in github_runner or 'state="closed"' not in github_runner:
+        failures.append("GitHub live runner must keep finally-based issue cleanup")
+    if "LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED" not in github_runner:
+        failures.append("GitHub live output must remain candidate/not-published")
 
-    output_assignment = _output_assignment_source(runner)
-    if output_assignment is None:
-        failures.append("live runner must define an explicit OUTPUT evidence target")
+    github_output = _output_assignment_source(github_runner)
+    if github_output is None:
+        failures.append("GitHub live runner must define an explicit OUTPUT evidence target")
     else:
-        if "VDB_EVIDENCE_PATH" not in output_assignment:
-            failures.append("live evidence target must remain configurable via VDB_EVIDENCE_PATH")
-        if "vdb-live-github-evidence.json" not in output_assignment:
-            failures.append("live evidence default must remain the dedicated evidence JSON file")
-        if "results" in output_assignment.lower():
-            failures.append("live evidence OUTPUT must not target benchmark results")
+        if "VDB_EVIDENCE_PATH" not in github_output:
+            failures.append("GitHub live evidence target must remain configurable")
+        if "vdb-live-github-evidence.json" not in github_output:
+            failures.append("GitHub live evidence default must remain dedicated")
+        if "results" in github_output.lower():
+            failures.append("GitHub live evidence OUTPUT must not target benchmark results")
+
+    # Stripe P0-4A financial-provider boundary.
+    _manual_only(stripe_workflow, "Stripe live", failures)
+    if "inputs.confirm == 'RUN_STRIPE_P0_4A'" not in stripe_workflow:
+        failures.append("Stripe live workflow must retain explicit human confirmation gate")
+    if "contents: read" not in stripe_workflow or "contents: write" in stripe_workflow:
+        failures.append("Stripe live workflow permissions must stay contents:read only")
+    if "STRIPE_VDB_SANDBOX_SECRET_KEY" not in stripe_workflow:
+        failures.append("Stripe live workflow must use the dedicated sandbox secret")
+    if "sk_live_" in stripe_workflow or "rk_live_" in stripe_workflow:
+        failures.append("Stripe live workflow must never embed a live-key marker")
+    if "RUN_STRIPE_P0_4A" not in stripe_workflow:
+        failures.append("Stripe live workflow confirmation token missing")
+
+    # Parsing is also a syntax gate for the live runner.
+    stripe_tree = ast.parse(stripe_runner)
+    del stripe_tree
+    for marker in (
+        "REFUSED: live Stripe API key detected",
+        "livemode",
+        "pm_card_visa",
+        "LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED",
+        "toctou_authority_revocation",
+    ):
+        if marker not in stripe_runner:
+            failures.append(f"Stripe live runner missing required safety/evidence marker: {marker}")
+
+    stripe_output = _output_assignment_source(stripe_runner)
+    if stripe_output is None:
+        failures.append("Stripe live runner must define an explicit OUTPUT evidence target")
+    else:
+        if "VDB_EVIDENCE_PATH" not in stripe_output:
+            failures.append("Stripe live evidence target must remain configurable")
+        if "vdb-live-stripe-evidence.json" not in stripe_output:
+            failures.append("Stripe live evidence default must remain dedicated")
+        if "results" in stripe_output.lower():
+            failures.append("Stripe live evidence OUTPUT must not target benchmark results")
 
     if failures:
         for failure in failures:
             print(f"FAIL: {failure}")
         return 1
-    print("PASS: live GitHub benchmark workflow remains manual-only and bounded")
+
+    print("PASS: live GitHub and Stripe benchmark workflows remain manual-only and bounded")
     return 0
 
 
