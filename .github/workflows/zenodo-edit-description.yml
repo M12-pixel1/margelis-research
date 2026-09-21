@@ -64,9 +64,14 @@ jobs:
           if "Related implementation by the same publisher" in meta.get("description", ""):
               print("Description already contains the paragraph. Nothing to do."); sys.exit(0)
           # apsauga: naujas aprasymas privalo TURETI visa sena aprasyma (pridedam, ne perrasom)
-          old = meta.get("description", "").strip()
-          if old and old not in new_desc:
-              print("REFUSING: new description does not contain the old one verbatim."); sys.exit(2)
+          # Zenodo normalizuoja HTML saugodamas (tarpai, kabutes), todel lyginam TEKSTA be zymu
+          import re, html as _h
+          norm = lambda t: re.sub(r"\s+", " ", _h.unescape(re.sub(r"<[^>]+>", " ", t))).strip()
+          old = meta.get("description", "")
+          if old and norm(old) not in norm(new_desc):
+              a, b = norm(old), norm(new_desc); i = next((k for k in range(min(len(a), len(b))) if a[k] != b[k]), min(len(a), len(b)))
+              print("REFUSING: old text not contained in new. First divergence at", i); print("OLD:", a[max(0,i-80):i+120]); print("NEW:", b[max(0,i-80):i+120]); sys.exit(2)
+          print("safety: old text (", len(norm(old)), "chars) is contained in new text (", len(norm(new_desc)), "chars)")
           meta = {k: v for k, v in meta.items() if k not in ("prereserve_doi",)}
           meta["description"] = new_desc
           if os.environ["CONFIRM"] != "PUBLISH":
