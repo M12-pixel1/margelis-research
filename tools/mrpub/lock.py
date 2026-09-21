@@ -46,7 +46,8 @@ def lock_pins() -> dict[str, str]:
     if not LOCK.exists():
         return {}
     return {_norm(m.group(1)): m.group(2)
-            for m in re.finditer(r"(?m)^([A-Za-z0-9_.\-]+)==([A-Za-z0-9_.\-]+)", LOCK.read_text(encoding="utf-8"))}
+            for m in re.finditer(r"(?m)^([A-Za-z0-9_.\-]+)==([A-Za-z0-9_.\-]+)(?:;[^\\\n]*)? \\$",
+                                 LOCK.read_text(encoding="utf-8"))}
 
 
 def _wanted(filename: str) -> bool:
@@ -60,16 +61,45 @@ def _wanted(filename: str) -> bool:
         and any(arch in filename for arch in ("x86_64", "win_amd64", "arm64", "aarch64", "universal2"))
 
 
-def _requirement_names(requires_dist: list[str]) -> list[str]:
-    """Names of unconditional runtime requirements (extras and environment markers are skipped)."""
-    names = []
+PY_VERSION = (3, 14)  # the interpreter the lock targets (CI pins python-version 3.14)
+_VERSION_MARKER = re.compile(r'\s*(python_version|python_full_version)\s*(<=|>=|==|!=|<|>)\s*"([0-9.]+)"\s*')
+
+
+def _version_marker(marker: str) -> bool | None:
+    """Decide a marker that only compares the interpreter version; None when it is another kind."""
+    m = _VERSION_MARKER.fullmatch(marker)
+    if not m:
+        return None
+    want = tuple(int(x) for x in m.group(3).split("."))
+    have = (PY_VERSION + (0,))[:len(want)]
+    return {"<": have < want, "<=": have <= want, "==": have == want,
+            "!=": have != want, ">": have > want, ">=": have >= want}[m.group(2)]
+
+
+def _requirements(requires_dist: list[str]) -> list[tuple[str, str | None]]:
+    """(name, marker) of the runtime requirements a plain `pip install` pulls on the target interpreter.
+
+    Extras are skipped. Interpreter-version markers are decided against PY_VERSION. Every other
+    marker (platform, implementation) is carried verbatim into the lock so pip applies it per
+    platform: leaving such a dependency out would break a --require-hashes install.
+    """
+    out = []
     for spec in requires_dist or []:
-        if ";" in spec:  # extras / markers: not installed by a plain `pip install`
+        req, _, marker = spec.partition(";")
+        marker = " ".join(marker.split())
+        m = re.match(r"\s*([A-Za-z0-9_.\-]+)", req)
+        if not m:
             continue
-        m = re.match(r"\s*([A-Za-z0-9_.\-]+)", spec)
-        if m:
-            names.append(_norm(m.group(1)))
-    return names
+        if marker:
+            if re.search(r"\bextra\s*==", marker):
+                continue
+            decided = _version_marker(marker)
+            if decided is False:
+                continue
+            if decided is True:
+                marker = ""
+        out.append((_norm(m.group(1)), marker or None))
+    return out
 
 
 def resolve(pins: dict[str, str]) -> dict[str, dict]:
@@ -77,6 +107,7 @@ def resolve(pins: dict[str, str]) -> dict[str, dict]:
     known = dict(pins)
     known.update({k: v for k, v in lock_pins().items() if k not in known})
     out: dict[str, dict] = {}
+    markers: dict[str, str | None] = dict.fromkeys(pins)
     queue = list(pins)
     while queue:
         name = queue.pop(0)
@@ -92,8 +123,19 @@ def resolve(pins: dict[str, str]) -> dict[str, dict]:
         files = sorted((f["filename"], f["digests"]["sha256"]) for f in data["urls"] if _wanted(f["filename"]))
         if not files:
             raise PipelineError(f"{name}=={version}: no wheel or sdist for the supported platforms")
-        out[name] = {"version": version, "files": files}
-        queue += [d for d in _requirement_names(data["info"].get("requires_dist") or []) if d not in out]
+        out[name] = {"version": version, "files": files, "marker": markers.get(name)}
+        for dep, marker in _requirements(data["info"].get("requires_dist") or []):
+            if dep in markers:
+                if marker is None or markers[dep] is None:
+                    markers[dep] = None  # unconditional on at least one path
+                elif marker != markers[dep]:
+                    markers[dep] = f"({markers[dep]}) or ({marker})"
+            else:
+                markers[dep] = marker
+            if dep in out:
+                out[dep]["marker"] = markers[dep]
+            elif dep not in queue:
+                queue.append(dep)
     return out
 
 
@@ -101,7 +143,8 @@ def render(resolved: dict[str, dict]) -> str:
     lines = [HEADER]
     for name in sorted(resolved):
         e = resolved[name]
-        lines.append(f"{name}=={e['version']} \\")
+        marker = f"; {e['marker']}" if e.get("marker") else ""
+        lines.append(f"{name}=={e['version']}{marker} \\")
         for i, (_, digest) in enumerate(e["files"]):
             tail = " \\" if i < len(e["files"]) - 1 else ""
             lines.append(f"    --hash=sha256:{digest}{tail}")

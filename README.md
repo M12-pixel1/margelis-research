@@ -137,6 +137,9 @@ Rules the pipeline enforces:
   the Zenodo step keeps the draft closed and refuses to publish.
 - Every publishable file is scanned for credentials and private operational data,
   and every guard is exercised with an injected defect in CI (`tools/test_checks_negative.py`).
+- All Python dependencies, including the benchmark's `cryptography`, install from one
+  hash-pinned lock; the lock resolver keeps platform markers and is unit-tested
+  (`tools/test_lock.py`) so a CPython-only dependency cannot silently drop out.
 - A weekly workflow (`drift-check`, also runnable by hand) re-probes every
   publication location and opens an issue on drift; GitHub suspends the schedule
   after 60 days without commits, so its last run date is part of the owner's

@@ -103,7 +103,9 @@ second payment executor.
 
 Files:
 
-- `requirements-signed-action.txt` — isolated benchmark-only crypto dependency;
+- the `cryptography` dependency (with `cffi`/`pycparser`) is pinned in
+  `tools/requirements.txt` and hash-locked in `tools/requirements.lock`, the one
+  install path CI uses; there is no separate unpinned install for this test;
 - `signed_action.py` — canonical Stripe sandbox action, Ed25519 mandate and
   role-separated receipt primitives, run-local replay gate;
 - `test_signed_action.py` — fail-closed tamper, wrong-human-confirmation,

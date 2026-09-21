@@ -7,3 +7,8 @@ pypdf==6.10.2
 jsonschema==4.26.0
 requests==2.32.5
 pillow==11.3.0
+# Stripe signed-action contract test (benchmark/v0.2/live/stripe); cffi/pycparser are its
+# transitive dependencies on CPython and must be pinned here for the hash lock.
+cryptography==50.0.0
+cffi==2.1.1
+pycparser==3.0
