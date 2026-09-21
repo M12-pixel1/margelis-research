@@ -1,0 +1,84 @@
+name: Zenodo — edit description of a published record
+
+# Vienkartinis metaduomenu redagavimas: paima DABARTINIUS publikuoto depozito
+# metaduomenis, pakeicia TIK `description` is failo repo sakoje, publikuoja
+# (DOI nesikeicia, naujos versijos nekuria). Viskas kita — creators, keywords,
+# related_identifiers, references, license — lieka baitas i baita.
+#
+# Kodel Actions, o ne lokaliai: ZENODO_ACCESS_TOKEN gyvena tik repo paslaptyse,
+# o zenodo.org blokuoja lokalu IP ("unusual traffic"). Runner'is turi abu.
+
+on:
+  workflow_dispatch:
+    inputs:
+      deposition_id:
+        description: "Zenodo deposition id (published record)"
+        required: true
+      description_file:
+        description: "Path in this branch to the HTML description"
+        required: true
+        default: ".github/zenodo/001_description_v1.1.html"
+      confirm:
+        description: "Type PUBLISH to actually publish (anything else = dry run)"
+        required: true
+        default: "dry-run"
+
+permissions:
+  contents: read
+
+jobs:
+  edit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Edit description and publish
+        env:
+          ZENODO_ACCESS_TOKEN: ${{ secrets.ZENODO_ACCESS_TOKEN }}
+          DEP: ${{ inputs.deposition_id }}
+          DESC_FILE: ${{ inputs.description_file }}
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          python - <<'PY'
+          import json, os, sys, urllib.request, urllib.error
+          tok = os.environ["ZENODO_ACCESS_TOKEN"]; dep = os.environ["DEP"]
+          base = "https://zenodo.org/api/deposit/depositions/" + dep
+          H = {"Authorization": "Bearer " + tok, "Content-Type": "application/json",
+               "User-Agent": "margelis-research-zenodo-edit/1.0"}
+          def call(method, url, body=None, ok=(200, 201, 202)):
+              req = urllib.request.Request(url, data=json.dumps(body).encode() if body is not None else None,
+                                           headers=H, method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r:
+                      txt = r.read().decode(); return r.status, (json.loads(txt) if txt else {})
+              except urllib.error.HTTPError as e:
+                  print("HTTP", e.code, e.read()[:500].decode("utf-8", "replace")); sys.exit(1)
+          new_desc = open(os.environ["DESC_FILE"], encoding="utf-8").read().strip()
+          st, d = call("GET", base)
+          meta = d["metadata"]
+          print("record:", d.get("doi"), "| state:", d.get("state"), "| submitted:", d.get("submitted"))
+          print("old description len:", len(meta.get("description", "")), "| new:", len(new_desc))
+          if "Related implementation by the same publisher" in meta.get("description", ""):
+              print("Description already contains the paragraph. Nothing to do."); sys.exit(0)
+          # apsauga: naujas aprasymas privalo TURETI visa sena aprasyma (pridedam, ne perrasom)
+          old = meta.get("description", "").strip()
+          if old and old not in new_desc:
+              print("REFUSING: new description does not contain the old one verbatim."); sys.exit(2)
+          meta = {k: v for k, v in meta.items() if k not in ("prereserve_doi",)}
+          meta["description"] = new_desc
+          if os.environ["CONFIRM"] != "PUBLISH":
+              print("DRY RUN — would PUT metadata with new description and publish. Keys:", sorted(meta)); sys.exit(0)
+          st, _ = call("POST", base + "/actions/edit", ok=(201, 200))
+          print("actions/edit ->", st)
+          st, _ = call("PUT", base, {"metadata": meta})
+          print("PUT metadata ->", st)
+          st, pub = call("POST", base + "/actions/publish")
+          print("actions/publish ->", st, "| doi:", pub.get("doi"), "| state:", pub.get("state"))
+          st, chk = call("GET", base)
+          ok = "Related implementation by the same publisher" in chk["metadata"].get("description", "")
+          print("VERIFY paragraph present after publish:", ok)
+          sys.exit(0 if ok else 3)
+          PY
