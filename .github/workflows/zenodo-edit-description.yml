@@ -64,14 +64,19 @@ jobs:
           if "Related implementation by the same publisher" in meta.get("description", ""):
               print("Description already contains the paragraph. Nothing to do."); sys.exit(0)
           # apsauga: naujas aprasymas privalo TURETI visa sena aprasyma (pridedam, ne perrasom)
-          # Zenodo normalizuoja HTML saugodamas (tarpai, kabutes), todel lyginam TEKSTA be zymu
+          # Zenodo normalizuoja HTML saugodamas, o nauja pastraipa iterpta I VIDURI — todel
+          # tikrinam PASTRAIPU lygiu: kiekviena sena <p>/<li> pastraipa privalo buti naujame tekste.
           import re, html as _h
           norm = lambda t: re.sub(r"\s+", " ", _h.unescape(re.sub(r"<[^>]+>", " ", t))).strip()
           old = meta.get("description", "")
-          if old and norm(old) not in norm(new_desc):
-              a, b = norm(old), norm(new_desc); i = next((k for k in range(min(len(a), len(b))) if a[k] != b[k]), min(len(a), len(b)))
-              print("REFUSING: old text not contained in new. First divergence at", i); print("OLD:", a[max(0,i-80):i+120]); print("NEW:", b[max(0,i-80):i+120]); sys.exit(2)
-          print("safety: old text (", len(norm(old)), "chars) is contained in new text (", len(norm(new_desc)), "chars)")
+          chunks = [norm(c) for c in re.split(r"</p>|</li>", old)]
+          chunks = [c for c in chunks if len(c) > 20]
+          nn = norm(new_desc); missing = [c for c in chunks if c not in nn]
+          if missing:
+              print("REFUSING: %d of %d old paragraphs missing in new text:" % (len(missing), len(chunks)))
+              for c in missing[:3]: print("  MISSING:", c[:160])
+              sys.exit(2)
+          print("safety: all", len(chunks), "old paragraphs present in new text; added chars:", len(nn) - len(norm(old)))
           meta = {k: v for k, v in meta.items() if k not in ("prereserve_doi",)}
           meta["description"] = new_desc
           if os.environ["CONFIRM"] != "PUBLISH":
