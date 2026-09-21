@@ -34,10 +34,17 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_VDB_SANDBOX_SECRET_KEY }}
           VDB_EVIDENCE_PATH: vdb-live-stripe-evidence.json
         run: python benchmark/v0.2/live/stripe_payment_runner.py
+      - name: Export Verified Action Core contract evidence
+        env:
+          VDB_EVIDENCE_PATH: vdb-live-stripe-evidence.json
+          MARGELIS_VAC_EVIDENCE_PATH: vdb-live-stripe-verified-action-core.json
+        run: python benchmark/v0.2/live/stripe/verified_action_core_adapter.py
       - name: Upload evidence bundle
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: vdb-live-stripe-${{ github.run_id }}
-          path: vdb-live-stripe-evidence.json
+          path: |
+            vdb-live-stripe-evidence.json
+            vdb-live-stripe-verified-action-core.json
           if-no-files-found: error
           retention-days: 90
