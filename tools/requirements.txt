@@ -2,7 +2,7 @@
 # committed PDF byte-for-byte. Changing a version may change the PDF bytes.
 markdown-it-py==4.0.0
 PyYAML==6.0.3
-reportlab==4.5.0
+reportlab==5.0.1
 pypdf==6.10.2
 jsonschema==4.26.0
 requests==2.32.5
