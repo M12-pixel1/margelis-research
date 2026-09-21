@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 from . import citation, site
-from .common import (ROOT, SITE, Note, PipelineError, epoch_of, git, load_json, load_note, parse_sums,
+from .common import (ROOT, SITE, Note, PipelineError, epoch_of, git, human_date, load_json, load_note, parse_sums,
                      sha256_file, write_json, write_text)
 from .pdf import render_pdf
 
@@ -131,6 +131,86 @@ def build_site_and_citation() -> list[Path]:
     citation.write(notes)
     write_text(ROOT / "LICENSE", license_text(notes))
     written += [ROOT / "CITATION.cff", ROOT / "LICENSE"]
+    written += write_readmes(notes)
+    return written
+
+
+README_START, README_END = "<!-- notes:start -->", "<!-- notes:end -->"
+
+
+def readme_notes_block(notes: list[Note]) -> str:
+    """The generated part of README.md: one table row per note plus its current links."""
+    lines = ["| Note | Title | Version | Date | Status | DOI |", "| --- | --- | --- | --- | --- | --- |"]
+    for n in notes:
+        doi = n.doi()
+        doi_cell = f"[{doi}](https://doi.org/{doi})" if doi else "pending"
+        lines.append(f"| [{n.number}](research/{n.number}/) | {n.full_title} | {n.version} | {n.date} | {n.meta['status']} | {doi_cell} |")
+    for n in notes:
+        lines += ["", f"### Research Note {n.number}", "",
+                  f"- Markdown (canonical source): [`research/{n.number}/{n.md_path.name}`](research/{n.number}/{n.md_path.name})",
+                  f"- PDF: [`research/{n.number}/{n.pdf_path.name}`](research/{n.number}/{n.pdf_path.name})",
+                  f"- Release manifest and digests: [`metadata.json`](research/{n.number}/metadata.json), "
+                  f"[`SHA256SUMS`](research/{n.number}/SHA256SUMS)",
+                  f"- GitHub release: [`{n.tag}`]({n.release_url})" + (
+                      "; earlier versions: " + ", ".join(
+                          f"[`research-note-{n.number}-v{v}`]({n.repo_url}/releases/tag/research-note-{n.number}-v{v})"
+                          for v in n.previous_versions()) if n.previous_versions() else ""),
+                  f"- Canonical web page: <{n.canonical_url}>; mirror built from this repository: <{n.preview_url}>",
+                  f"- Archive: " + (f"DOI [{doi}](https://doi.org/{doi}) (this version); all versions: "
+                                    f"[{n.concept_doi()}](https://doi.org/{n.concept_doi()})"
+                                    if (doi := n.doi()) and n.concept_doi() else "Zenodo record pending"),
+                  f"- Where it is published and the verification results: "
+                  f"[`publication-receipt.json`](research/{n.number}/publication-receipt.json)",
+                  ]
+    return "\n".join(lines) + "\n"
+
+
+def research_readme(n: Note) -> str:
+    doi = n.doi()
+    prev = n.previous_versions()
+    lines = [f"# {n.series_name} Note {n.number}", "", f"**{n.full_title}**", "",
+             f"{', '.join(n.author_names)} · {n.authors[0]['affiliation']} · Version {n.version} · "
+             f"{human_date(n.date)} · Status: {n.meta['status']}", "",
+             "| File | Role |", "| --- | --- |",
+             f"| [`{n.md_path.name}`]({n.md_path.name}) | Canonical source text |",
+             f"| [`{n.pdf_path.name}`]({n.pdf_path.name}) | PDF rendition, built from the Markdown |",
+             f"| [`metadata.json`](metadata.json) | Release manifest (immutable for v{n.version}) |",
+             "| [`SHA256SUMS`](SHA256SUMS) | Digests of the three files above |",
+             "| [`note.yaml`](note.yaml) | Hand-edited input metadata |",
+             "| [`references.json`](references.json) | Cited works with the sources used to check them |",
+             "| [`zenodo.json`](zenodo.json) | Zenodo record of every version |",
+             "| [`publication-receipt.json`](publication-receipt.json) | Where this version is published, each fact probed when the receipt was generated |",
+             ]
+    if prev:
+        lines.append("| [`receipts/`](receipts/) | Receipts of earlier versions |")
+    lines += ["", "Identifiers:", "",
+              f"- DOI of this version: {f'[{doi}](https://doi.org/{doi})' if doi else 'pending'}",
+              f"- DOI of all versions (resolves to the latest): "
+              + (f"[{n.concept_doi()}](https://doi.org/{n.concept_doi()})" if n.concept_doi() else "pending"),
+              f"- License of the note text: {n.license['spdx'] if n.license_granted else 'pending'} (see the repository LICENSE)",
+              "", "Versions:", ""]
+    for h in n.meta["version_history"]:
+        v = str(h["version"])
+        vdoi = n.version_doi(v)
+        lines.append(f"- v{v} ({human_date(str(h['date']))}): {h['summary']} "
+                     f"[release]({n.repo_url}/releases/tag/research-note-{n.number}-v{v})"
+                     + (f" · [DOI](https://doi.org/{vdoi})" if vdoi else ""))
+    lines += ["", "Rebuild and check:", "", "```bash", f"python tools/publish.py verify {n.number} --rebuild --online", "```", ""]
+    return "\n".join(lines)
+
+
+def write_readmes(notes: list[Note]) -> list[Path]:
+    written = []
+    readme = ROOT / "README.md"
+    text = readme.read_text(encoding="utf-8")
+    if README_START in text and README_END in text:
+        head, rest = text.split(README_START, 1)
+        _, tail = rest.split(README_END, 1)
+        write_text(readme, f"{head}{README_START}\n{readme_notes_block(notes)}{README_END}{tail}")
+        written.append(readme)
+    for n in notes:
+        write_text(n.dir / "README.md", research_readme(n))
+        written.append(n.dir / "README.md")
     return written
 
 

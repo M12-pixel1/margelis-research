@@ -2,9 +2,11 @@
 
 **Status: draft specification with executable local, process-isolated and live
 external-system harnesses.** This document and the files next to it define the
-benchmark format. One repeatability-backed GitHub Issues P0-3 result is
-published under `results/`; Stripe P0-4A remains an unpublished live-sandbox
-candidate. Nothing here is an industry standard.
+benchmark format. One repeatability-backed GitHub Issues P0-3 result bundle is
+published under `results/`; its systems under test are repository-defined
+reference behaviours against an external system of record, and no result about
+a production or third-party agent system is published. Stripe P0-4A remains an
+unpublished live-sandbox candidate. Nothing here is an industry standard.
 
 The benchmark operationalizes
 [Margelis Research Note 001](../../research/001/Margelis_Research_Note_001.md)
@@ -151,10 +153,14 @@ Per Research Note 001, section 10, **results are published only once an
 independent rerun is possible**: the fixtures, harness, baseline versions and
 raw evidence must be available so that a third party can reproduce the result
 matrix. For an actual system-under-test this also requires an external or
-otherwise independently observable authoritative-state fixture. Published
-bundles live under `results/` and must pass the deterministic result-bundle
-validator. Live runs that have not yet passed repeatability, durable-evidence
-and Human Gate requirements remain candidates and must not be written there.
+otherwise independently observable authoritative-state fixture. A bundle that
+meets this rule is published under `results/<bundle>/` with its raw evidence,
+its provenance (source commit, runner blob, workflow and the head commit and
+trigger of every run) and its limitations, and must pass
+`tools/mrpub/benchmark_results.py`. Repeated runs by the publisher demonstrate
+repeatability, not an independent reproduction, and are labelled as such. Live
+runs that have not yet passed repeatability, durable-evidence and publication
+review remain candidates and must not be written to `results/`.
 
 ## 9. Versioning
 

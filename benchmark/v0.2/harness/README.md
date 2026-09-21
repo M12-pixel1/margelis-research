@@ -42,6 +42,9 @@ state are deterministic local fixtures. They are not production systems and
 not third-party autonomous agents. Nothing produced by this harness is written
 to `benchmark/v0.2/results/`.
 
-Public results remain blocked until the benchmark has a reproducible external
-fixture or sandbox, exact system-under-test versions, raw evidence, digests and
-independent rerun instructions as required by `../SPEC.md` section 8.
+Results for a third-party or production system-under-test remain unpublished
+until such a system can be rerun with a reproducible external fixture, exact
+versions, raw evidence, digests and rerun instructions (`../SPEC.md` section 8).
+The one published bundle, `../results/github-p0-3-repeatability-2026-09-17/`,
+tests repository-defined reference behaviours against GitHub Issues, not this
+harness and not a production system.

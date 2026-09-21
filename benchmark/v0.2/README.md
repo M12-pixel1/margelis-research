@@ -1,8 +1,11 @@
 # Verified Delegation Benchmark v0.2 (draft)
 
-Status: **draft implementation; no public benchmark results.** The ten scenario
-and receipt formats remain draft. Two executable P0 stages now test the benchmark
-machinery itself; neither is a production-system benchmark result.
+Status: **draft implementation with one published result bundle.** The ten
+scenario and receipt formats remain draft. Two executable P0 stages test the
+benchmark machinery itself, and a manual-only live stage runs three scenarios
+against GitHub Issues. The published bundle in `results/` covers
+repository-defined unsafe and guarded reference behaviours, not a commercial
+or production agent system; its limitations are normative.
 
 | Path | Content |
 | --- | --- |
@@ -13,7 +16,10 @@ machinery itself; neither is a production-system benchmark result.
 | [`schemas/examples/`](schemas/examples/) | Synthetic receipt examples (not results) |
 | [`harness/`](harness/) | Deterministic P0 self-test harness: expired mandate, replay, false DONE |
 | [`sandbox/`](sandbox/) | Process-isolated HTTP + SQLite authoritative-state sandbox for the same P0 cases |
-| [`results/`](results/) | Empty until independent rerun of an actual system-under-test is possible |
+| [`live/`](live/) | Manual-only live stage against GitHub Issues (creates and closes synthetic issues) |
+| [`live/stripe/`](live/stripe/) | Manual-only Stripe test-sandbox stage (candidate only; needs a sandbox key secret, refuses live keys) |
+| [`candidates/`](candidates/) | Pre-publication audit packages of reviewed candidates |
+| [`results/`](results/) | Published result bundles with raw evidence, provenance and limitations |
 
 Validate the benchmark definitions:
 
@@ -44,6 +50,8 @@ benchmark machinery survives a process/network/state boundary, not evidence abou
 third-party or production autonomous-agent system.
 
 The benchmark is derived from
-[Margelis Research Note 001](../../research/001/). Public Verified Delegation
-Benchmark v0.2 results will be published only when an actual system-under-test
-can be independently rerun with its fixtures, versions and raw evidence.
+[Margelis Research Note 001](../../research/001/). A result bundle is published
+in `results/` only when a third party can rerun it from this repository (fixtures,
+versions, workflow and raw evidence are all recorded) and it passes the
+result-bundle validator in `tools/mrpub/benchmark_results.py`. A published
+bundle is evidence about the system it names and nothing wider.

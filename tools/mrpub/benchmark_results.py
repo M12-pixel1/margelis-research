@@ -131,7 +131,7 @@ def _validate_bundle(root: Path, bundle: Path) -> list[str]:
 
     runs = manifest.get("runs")
     if not isinstance(runs, list) or len(runs) < 2:
-        problems.append(f"{label}: at least two independent runs are required")
+        problems.append(f"{label}: at least two repeated runs are required")
         runs = []
     run_ids: set[str] = set()
     for run in runs:
@@ -145,6 +145,21 @@ def _validate_bundle(root: Path, bundle: Path) -> list[str]:
         if run_id in run_ids:
             problems.append(f"{label}: duplicate run_id {run_id}")
         run_ids.add(run_id)
+
+        head = run.get("head_sha")
+        if head is not None:
+            # the commit each run actually executed must be recorded and must carry the same runner
+            if not isinstance(head, str) or not HEX40.fullmatch(head):
+                problems.append(f"{label}: run {run_id} head_sha must be a 40-hex commit SHA")
+            elif runner_path and isinstance(runner_blob_sha, str):
+                try:
+                    if git("rev-parse", f"{head}:{runner_path}") != runner_blob_sha:
+                        problems.append(f"{label}: run {run_id} executed a different runner than source.runner_blob_sha")
+                except PipelineError:
+                    problems.append(f"{label}: run {run_id} head commit {head[:7]} is not fetchable "
+                                    f"(push a tag such as vdb-run-{run_id} pointing at it)")
+            if run.get("event") not in {"push", "workflow_dispatch", "schedule", "pull_request"}:
+                problems.append(f"{label}: run {run_id} event must record how the run was triggered")
 
         raw_digest = run.get("raw_evidence_json_sha256")
         if not isinstance(raw_digest, str) or not HEX64.fullmatch(raw_digest):

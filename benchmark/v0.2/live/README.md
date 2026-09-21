@@ -16,6 +16,13 @@ The live runner exercises three P0 cases:
   object; independent GET readback keeps the guarded receipt out of
   `VERIFIED_SUCCESS`.
 
+Both "systems" are code paths inside the single runner process
+`github_issues_runner.py`, authenticated with the same workflow token. The
+guarded path does not evaluate an authorization policy; it omits the forbidden
+API call. The readback is a GET issued by the same process, so it is an
+independent observation of the external state but not a verifier component
+separate from the executor in the sense of `../SPEC.md` section 2.
+
 ## Safety boundary
 
 The runner creates only synthetic issues whose titles begin with `[VDB LIVE ...]`.
@@ -33,8 +40,10 @@ The output is labelled:
 `LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED`
 
 It is uploaded as a GitHub Actions artifact and is **not** written to
-`benchmark/v0.2/results/`. Publication requires review of the live bundle,
-repeatability and the benchmark publication gate in `../SPEC.md`.
+`benchmark/v0.2/results/` by the workflow. Publication requires review of the
+live bundle, repeatability and the benchmark publication gate in `../SPEC.md`;
+a reviewed bundle is then promoted into `results/` through a pull request (see
+`../results/README.md` for the published bundles).
 
 ## Reproduction
 

@@ -1,0 +1,43 @@
+{
+  "series": "Margelis Research",
+  "publisher": "Rūpestėlis Holding",
+  "canonical_base": "https://rupestelisholding.com/research/",
+  "repository": "https://github.com/M12-pixel1/margelis-research",
+  "notes": [
+    {
+      "number": "001",
+      "title": "From Mandate to Verified Outcome: An Evaluation Framework for Autonomous Agent Execution",
+      "version": "1.1",
+      "date": "2026-09-17",
+      "status": "Concept + Evaluation Framework",
+      "authors": [
+        "Tomas Margelis"
+      ],
+      "publisher": "Rūpestėlis Holding",
+      "url": "https://rupestelisholding.com/research/001/",
+      "pdf": "https://rupestelisholding.com/research/001/v1.1/Margelis_Research_Note_001.pdf",
+      "markdown": "https://rupestelisholding.com/research/001/v1.1/Margelis_Research_Note_001.md",
+      "doi": "10.5281/zenodo.22806682",
+      "concept_doi": "10.5281/zenodo.22806277",
+      "license": "CC-BY-4.0",
+      "release": "https://github.com/M12-pixel1/margelis-research/releases/tag/research-note-001-v1.1",
+      "sha256": {
+        "Margelis_Research_Note_001.md": "1833b592b04466433c9fead2333194c502db80edfd03b0f04a847689b30e7371",
+        "Margelis_Research_Note_001.pdf": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
+        "metadata.json": "bb18feef4cb161a80c7583cf564b43571c7cb3055959c650ea23003df0fe7552"
+      },
+      "versions": [
+        {
+          "version": "1.0",
+          "date": "2026-09-16",
+          "doi": "10.5281/zenodo.22806278"
+        },
+        {
+          "version": "1.1",
+          "date": "2026-09-17",
+          "doi": "10.5281/zenodo.22806682"
+        }
+      ]
+    }
+  ]
+}

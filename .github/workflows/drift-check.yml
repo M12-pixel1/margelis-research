@@ -1,0 +1,59 @@
+name: drift-check
+
+# Weekly re-verification of every publication location of every published note:
+# GitHub release assets, GitHub Pages mirror, canonical host, Zenodo record and DOI
+# resolution, plus the offline checks. A receipt is only evidence at the moment it
+# is generated, so the probe is repeated. On drift an issue is opened (or updated);
+# nothing is modified.
+#
+# GitHub disables scheduled workflows after 60 days without repository activity;
+# the automation is therefore registered in the owner's dead-man registry with a
+# review date, and the manual trigger below can always be used instead.
+on:
+  schedule:
+    - cron: "15 6 * * 1"   # Mondays 06:15 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: drift-check
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: "3.14"
+      - name: Install hash-pinned tools
+        run: python -m pip install --require-hashes -r tools/requirements.lock
+      - name: Probe every publication location (read-only)
+        id: probe
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          python tools/publish.py probe --all 2>&1 | tee probe.log
+      - name: Open or update a drift issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Publication drift detected by drift-check"
+          body="The weekly drift check found a publication location that no longer matches the repository. Log: $RUN_URL"$'\n\n```\n'"$(tail -c 6000 probe.log)"$'\n```'
+          existing="$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --label drift --body "$body" 2>/dev/null || gh issue create --title "$title" --body "$body"
+          fi

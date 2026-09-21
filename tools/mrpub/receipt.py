@@ -153,6 +153,12 @@ def probe_zenodo(note: Note) -> dict:
                       for f in (data.get("files") or [])}
             out["files_match"] = bool(remote) and remote == local
             out["concept_doi"] = data.get("conceptdoi")
+            # the live record must say what the pipeline generates (metadata can be edited after publication)
+            from .zenodo import metadata_diff
+            drift = metadata_diff(note, data.get("metadata", {}))
+            out["metadata_matches"] = not drift
+            if drift:
+                out["metadata_drift"] = sorted(drift)
     return out
 
 
@@ -190,6 +196,10 @@ def generate(note: Note, validations: list[Result]) -> dict:
         blockers.append({"item": "zenodo_doi", "state": zen["status"],
                          "cause": "No Zenodo access token has been provided." if zen["status"] == "NOT_STARTED"
                          else "The Zenodo draft has not been published."})
+    elif zen.get("metadata_matches") is False:
+        blockers.append({"item": "zenodo_metadata", "state": "DRIFT", "fields": zen.get("metadata_drift"),
+                         "cause": "The live Zenodo record's metadata differs from what the pipeline generates "
+                                  "(edited outside the pipeline?). Reconcile with `publish.py zenodo-edit-metadata`."})
     if not note.license_granted:
         blockers.append({"item": "license", "state": "PENDING",
                          "cause": "No license has been granted for the note text; an open-access archive record "

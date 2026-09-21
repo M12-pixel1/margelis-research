@@ -20,12 +20,14 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: "3.14"
-      - name: Install pinned tools
-        run: python -m pip install -r tools/requirements.txt
+      - name: Install hash-pinned tools
+        run: python -m pip install --require-hashes -r tools/requirements.lock
       - name: Canonical receipt branch tests
         run: python tools/test_probe_canonical.py
       - name: Zenodo flow tests (simulated API)
         run: python tools/test_zenodo_flow.py
+      - name: Every guard must bite (injected defects)
+        run: python tools/test_checks_negative.py
       - name: Verified Delegation Benchmark P0 harness self-test
         run: python benchmark/v0.2/harness/runner.py
       - name: Verified Delegation Benchmark P0 process sandbox

@@ -29,7 +29,7 @@ Output is therefore labelled:
 
 `PROCESS_SANDBOX_SELF_TEST_ONLY`
 
-Nothing from this runner is written to `../results/`. The publication gate in `../SPEC.md` remains unchanged: results require independently rerunnable fixtures, exact system versions and raw evidence.
+Nothing from this runner is written to `../results/`. The publication gate in `../SPEC.md` section 8 applies: a result bundle needs independently rerunnable fixtures, exact versions, raw evidence and validator-checked provenance. The one published bundle in `../results/` comes from the live GitHub Issues stage, not from this sandbox.
 
 Run locally:
 
