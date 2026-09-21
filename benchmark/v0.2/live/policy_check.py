@@ -23,11 +23,22 @@ def _output_assignment_source(source: str) -> str | None:
 
 
 def _manual_only(workflow: str, label: str, failures: list[str]) -> None:
-    if "workflow_dispatch:" not in workflow:
+    """The only trigger may be workflow_dispatch, in any YAML spelling (mapping, inline mapping or list)."""
+    import yaml
+    doc = yaml.safe_load(workflow) or {}
+    on = doc.get("on", doc.get(True))  # PyYAML reads a bare `on` key as boolean True
+    if isinstance(on, str):
+        triggers = {on}
+    elif isinstance(on, list):
+        triggers = set(on)
+    elif isinstance(on, dict):
+        triggers = set(on)
+    else:
+        triggers = set()
+    if "workflow_dispatch" not in triggers:
         failures.append(f"{label} workflow must require workflow_dispatch")
-    for trigger in ("push", "pull_request", "schedule"):
-        if re.search(rf"(?m)^\s*{trigger}:\s*$", workflow):
-            failures.append(f"{label} workflow must not run on {trigger}")
+    for extra in sorted(triggers - {"workflow_dispatch"}):
+        failures.append(f"{label} workflow must not run on {extra}")
 
 
 def main() -> int:

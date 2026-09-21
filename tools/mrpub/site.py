@@ -126,6 +126,8 @@ def render_body(note: Note) -> tuple[str, list[tuple[str, str]]]:
     tokens = md.parse(note.md_path.read_text(encoding="utf-8"))
     _, body = mdparse.split_title_block(tokens)
     toc = []
+    table_names = []
+    current = ""
     for i, tok in enumerate(body):
         if tok.type == "heading_open":
             text = mdparse.inline_text(body[i + 1])
@@ -133,10 +135,17 @@ def render_body(note: Note) -> tuple[str, list[tuple[str, str]]]:
             tok.attrSet("id", slug)
             if tok.tag == "h2":
                 toc.append((slug, text))
+                current = text
         elif tok.type == "th_open":
             tok.attrSet("scope", "col")
+        elif tok.type == "table_open":
+            table_names.append(f"Table: {current}" if current else "Table")
     out = md.renderer.render(body, md.options, {})
-    out = out.replace("<table>", '<div class="table-wrap" role="region" aria-label="Table" tabindex="0"><table>')
+    # each table region is named after its section so screen readers can tell them apart
+    parts = out.split("<table>")
+    out = parts[0] + "".join(
+        f'<div class="table-wrap" role="region" aria-label="{esc(table_names[k] if k < len(table_names) else "Table")}" '
+        f'tabindex="0"><table>{part}' for k, part in enumerate(parts[1:]))
     out = out.replace("</table>", "</table></div>")
     return out, toc
 
@@ -203,6 +212,8 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
 
     head = [
         f'<link rel="canonical" href="{esc(note.canonical_url)}">',
+        f'<link rel="alternate" type="application/atom+xml" title="{esc(note.series_name)}" '
+        f'href="{esc(note.series["site"]["canonical_base"])}feed.xml">',
         _meta("author", author_name),
         _meta("keywords", ", ".join(note.meta["web_keywords"])),
         _meta("robots", "index,follow"),
@@ -280,8 +291,8 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
         if changes:
             detail += "<ul>" + "".join(f"<li>{esc(c)}</li>" for c in changes) + "</ul>"
         return (f'<tr><td>{esc(v)}</td><td>{esc(human_date(str(h["date"])))}</td><td>{detail}</td>'
-                f'<td><a href="v{esc(v)}/{esc(pdf_name)}">PDF</a> · <a href="{esc(note.repo_url)}/releases/tag/'
-                f'research-note-{esc(note.number)}-v{esc(v)}">release</a></td><td>{doi_cell}</td></tr>')
+                f'<td><a href="v{esc(v)}/{esc(pdf_name)}">PDF v{esc(v)}</a> · <a href="{esc(note.repo_url)}/releases/tag/'
+                f'research-note-{esc(note.number)}-v{esc(v)}">release v{esc(v)}</a></td><td>{doi_cell}</td></tr>')
 
     versions_rows = "\n".join(version_row(h) for h in reversed(note.meta["version_history"]))
 
@@ -306,7 +317,7 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
 <a href="{esc(ver)}/metadata.json">metadata.json</a>
 <a href="{esc(ver)}/SHA256SUMS">SHA256SUMS</a>
 </p>
-<p class="note"><strong>Status: {esc(note.meta['status'])}.</strong> This note defines an evaluation framework; it reports no benchmark results.
+<p class="note"><strong>Status: {esc(note.meta['status'])}.</strong> {esc(note.meta['status_sentence'])}
 Its limitations are listed under <a href="#{esc(unproven)}">What remains unproven</a>.</p>
 <section class="abstract" aria-labelledby="abstract"><h2 id="abstract">Abstract</h2>
 <p>{esc(note.meta['abstract'])}</p></section>
@@ -375,13 +386,25 @@ def render_index(notes: list[Note], series: dict) -> str:
 <p class="meta">{esc(', '.join(n.author_names))} · {esc(n.authors[0]['affiliation'])}</p>
 </li>""")
     base = series["site"]["canonical_base"]
+    latest = max(notes, key=lambda x: x.number)
+    description = f"Technical research notes published by {series['publisher']}."
     head = "\n".join([
         f'<link rel="canonical" href="{esc(base)}">',
+        f'<link rel="alternate" type="application/atom+xml" title="{esc(series["series"])}" href="{esc(base)}feed.xml">',
         _meta("robots", "index,follow"),
         _meta("og:type", "website", True),
         _meta("og:site_name", series["series"], True),
         _meta("og:title", series["series"], True),
+        _meta("og:description", description, True),
         _meta("og:url", base, True),
+        _meta("og:image", f"{latest.canonical_url}{latest.og_image_name}", True),
+        _meta("og:image:width", "1200", True),
+        _meta("og:image:height", "630", True),
+        _meta("og:image:alt", f"{series['series']} Note {latest.number}: {latest.title}", True),
+        _meta("twitter:card", "summary_large_image"),
+        _meta("twitter:title", series["series"]),
+        _meta("twitter:description", description),
+        _meta("twitter:image", f"{latest.canonical_url}{latest.og_image_name}"),
         _json_ld({"@context": "https://schema.org", "@type": "CreativeWorkSeries", "name": series["series"],
                   "url": base, "publisher": {"@type": "Organization", "name": series["publisher"]}}),
     ])
@@ -426,6 +449,57 @@ def render_sitemap(notes: list[Note], series: dict) -> str:
         urls.append(f"  <url><loc>{esc(n.canonical_url)}</loc><lastmod>{n.date}</lastmod></url>")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "\n".join(urls) + "\n</urlset>\n")
+
+
+def render_feed(notes: list[Note], series: dict) -> str:
+    """Atom feed of published notes (one entry per note, updated on each new version)."""
+    base = series["site"]["canonical_base"]
+    updated = max(n.date for n in notes) + "T00:00:00Z"
+    entries = []
+    for n in sorted(notes, key=lambda x: x.number, reverse=True):
+        doi = n.doi()
+        summary = " ".join(n.meta["abstract"].split())
+        entries.append(f"""  <entry>
+    <title>{esc(n.full_title)}</title>
+    <link rel="alternate" type="text/html" href="{esc(n.canonical_url)}"/>
+    <link rel="enclosure" type="application/pdf" href="{esc(n.pdf_url)}"/>
+    <id>{esc(n.canonical_url)}</id>
+    <published>{esc(n.meta['version_history'][0]['date'])}T00:00:00Z</published>
+    <updated>{esc(n.date)}T00:00:00Z</updated>
+    <author><name>{esc(n.author_names[0])}</name></author>
+    <summary>{esc(summary)}</summary>
+    <content type="text">{esc(f"{series['series']} Note {n.number}, version {n.version}. Status: {n.meta['status']}." + (f" DOI {doi}." if doi else ""))}</content>
+  </entry>""")
+    return (f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{esc(series['series'])}</title>
+  <subtitle>{esc(f"Technical research notes published by {series['publisher']}")}</subtitle>
+  <link rel="alternate" type="text/html" href="{esc(base)}"/>
+  <link rel="self" type="application/atom+xml" href="{esc(base)}feed.xml"/>
+  <id>{esc(base)}</id>
+  <updated>{esc(updated)}</updated>
+""" + "\n".join(entries) + "\n</feed>\n")
+
+
+def render_index_json(notes: list[Note], per_note: dict[str, tuple[dict, dict]], series: dict) -> str:
+    """Machine-readable list of notes for tools and agents (mirrors the human index page)."""
+    items = []
+    for n in sorted(notes, key=lambda x: x.number):
+        metadata, sums = per_note[n.number]
+        items.append({
+            "number": n.number, "title": n.full_title, "version": n.version, "date": n.date,
+            "status": n.meta["status"], "authors": n.author_names, "publisher": n.publisher,
+            "url": n.canonical_url, "pdf": n.pdf_url,
+            "markdown": f"{n.canonical_url}v{n.version}/{n.md_path.name}",
+            "doi": n.doi(), "concept_doi": n.concept_doi(),
+            "license": n.license.get("spdx") if n.license_granted else None,
+            "release": n.release_url, "sha256": dict(sums),
+            "versions": [{"version": str(h["version"]), "date": str(h["date"]), "doi": n.version_doi(str(h["version"]))}
+                         for h in n.meta["version_history"]],
+        })
+    return json.dumps({"series": series["series"], "publisher": series["publisher"],
+                       "canonical_base": series["site"]["canonical_base"], "repository": series["repository"]["url"],
+                       "notes": items}, ensure_ascii=False, indent=2) + "\n"
 
 
 def render_og_image(note: Note, path: Path) -> None:
@@ -479,7 +553,10 @@ def write_site(notes: list[Note], series: dict, per_note: dict[str, tuple[dict, 
     write_text(root_index, render_root_redirect(series))
     write_text(site_root / "research" / "index.html", render_index(notes, series))
     write_text(site_root / "research" / "sitemap.xml", render_sitemap(notes, series))
-    written += [root_index, site_root / "research" / "index.html", site_root / "research" / "sitemap.xml"]
+    write_text(site_root / "research" / "feed.xml", render_feed(notes, series))
+    write_text(site_root / "research" / "index.json", render_index_json(notes, per_note, series))
+    written += [root_index, site_root / "research" / "index.html", site_root / "research" / "sitemap.xml",
+                site_root / "research" / "feed.xml", site_root / "research" / "index.json"]
     for n in notes:
         metadata, sums = per_note[n.number]
         page = n.site_dir / "index.html"

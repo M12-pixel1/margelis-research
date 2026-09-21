@@ -1,0 +1,14 @@
+# Update pull requests for the SHA-pinned actions and the pinned Python tools.
+# After merging a pip bump, run `python tools/publish.py lock` so that
+# tools/requirements.lock (hash-pinned, used by every workflow) follows; the
+# repo.dependency_lock check fails until it does.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /tools
+    schedule:
+      interval: weekly

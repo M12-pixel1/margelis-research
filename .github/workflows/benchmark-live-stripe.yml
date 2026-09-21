@@ -27,8 +27,8 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.14"
-      - name: Install pinned validation dependencies
-        run: python -m pip install -r tools/requirements.txt
+      - name: Install hash-pinned validation dependencies
+        run: "python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.lock"
       - name: Run Stripe sandbox P0-4A candidate
         env:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_VDB_SANDBOX_SECRET_KEY }}

@@ -16,8 +16,10 @@ site:
   preview_base: https://m12-pixel1.github.io/margelis-research/research/
 
 # Every note must contain these level-2 sections (numbering prefix is ignored).
+# Alternatives are separated by "|". "References" is the heading Google Scholar's
+# inclusion guidelines expect for the reference list; notes from 002 on should use it.
 required_sections:
-  - Prior art
+  - Prior art|References
   - What remains unproven
 
 # Marketing / novelty language that must not appear in published files

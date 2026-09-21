@@ -68,7 +68,7 @@ def notes_markdown(note: Note) -> str:
         "",
         *[f"- {s}" for s in unproven],
         "",
-        "This note defines an evaluation framework and reports no benchmark results.",
+        note.meta["status_sentence"],
         "",
         "### Files",
         "",

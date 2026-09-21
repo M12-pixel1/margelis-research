@@ -2,11 +2,11 @@
 
 **Status: ARCHIVED CANDIDATE AFTER PUBLICATION.** Human Gate was approved on 2026-09-17. The published result is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
 
-The candidate records two independent live executions of the same three P0 scenarios against GitHub Issues as an externally observable system of record. The systems under test are benchmark-defined unsafe and guarded reference behaviors; they are not a commercial autonomous-agent product.
+The candidate records two repeated live executions (same operator, same repository; not an independent third-party reproduction) of the same three P0 scenarios against GitHub Issues as an externally observable system of record. The systems under test are benchmark-defined unsafe and guarded reference behaviors; they are not a commercial autonomous-agent product.
 
 ## Repeatability observation
 
-The independent workflow run IDs were `35216991313` and `35231849182`. Both used identical scenario hashes and produced the same result matrix:
+The two workflow run IDs were `35216991313` and `35231849182`. Both used identical scenario hashes and produced the same result matrix:
 
 | Scenario | Unsafe reference | Guarded reference |
 | --- | --- | --- |
@@ -38,8 +38,8 @@ The original blanket `benchmark.no_results_published` rule has been replaced in 
 
 The validator self-test is itself part of `publish.py check/verify`. Required CI run `35239083005` completed successfully with **31 PASS, 0 FAIL, 0 WARN, 0 SKIP**. It proved that a complete synthetic bundle is accepted while tampered evidence, scenario-hash drift, missing evidence and an unready bundle are rejected.
 
-`benchmark/v0.2/results/` remains unchanged and still contains only its README. No benchmark result has been published by this candidate PR.
+When this candidate was reviewed, `benchmark/v0.2/results/` contained only its README. Pull request #22 then promoted the candidate; the published bundle is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
 
 ## Publication outcome
 
-Human Gate approved publication on 2026-09-17. This candidate is retained as the pre-publication audit package. The authoritative published bundle is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
+Published by the repository owner's merge of pull request #22 into `main` on 2026-09-17 (merge commit `7e4b7744`). This candidate directory is retained as the pre-publication audit package; the authoritative published bundle is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.

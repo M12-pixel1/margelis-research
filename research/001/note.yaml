@@ -22,10 +22,33 @@ authors:
 language: en
 publication_type: research note
 status: Concept + Evaluation Framework
+# One sentence shown on the web page, in the release notes and in the archive record.
+status_sentence: This note defines an evaluation framework and reports no benchmark results.
+# The note must contain at least this many Markdown tables (the adversarial test set).
+required_tables: 1
 
 zenodo:
   upload_type: publication
   publication_type: technicalnote
+  # Optional HTML appended to the archive description after the locked parts (abstract,
+  # status, "What remains unproven"). It is part of the record's metadata, not of the note.
+  # This paragraph was written to the live v1.1 record on 2026-09-21 by a one-off workflow
+  # (run 35564098815); it is kept here so that the repository and the record say the same
+  # thing and any later change goes through `publish.py zenodo-edit-metadata`.
+  description_addendum_html: >-
+    <p><strong>Related implementation by the same publisher.</strong> The
+    verification-and-receipt principle this note evaluates for agent actions is the one
+    Rūpestėlis Holding applies to its own published content under Article 50 of the EU AI Act
+    (Regulation (EU) 2024/1689): every AI-assisted item Margelis.ai publishes carries a signed
+    receipt that a third party can re-check without an account. Practitioner guidance with
+    primary sources: <a href="https://margelis.ai/ai-act-article-50.html">How to mark
+    AI-generated content under Article 50 and prove the marking is yours</a>;
+    <a href="https://margelis.ai/article-50-checklist.html">Article 50 readiness checklist
+    (16 checks)</a>; <a href="https://margelis.ai/ai-act-lithuania.html">EU AI Act in
+    Lithuania: who supervises it and what companies must do</a>. Signed publication registry:
+    <a href="https://margelis.ai/verify/">https://margelis.ai/verify/</a>. These pages are
+    operational summaries, not legal advice, and are not part of the licensed research
+    note.</p>
 
 abstract: >-
   A technical evaluation framework for testing whether consequential

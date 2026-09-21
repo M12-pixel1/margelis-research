@@ -37,7 +37,15 @@
       "artifact_zip_sha256": "f99db90abe22cd7699ed732cec30fd16439818beb49ec9eed166f8ab71575fde",
       "raw_evidence_json_sha256": "0464389ac5752676ea942ed83793697a27667c61fed95a92cd30b931bc22b65c",
       "durable_evidence_path": "evidence/run-35216991313.json",
-      "artifact_expires_at": "2026-12-16T11:41:10Z"
+      "artifact_expires_at": "2026-12-16T11:41:10Z",
+      "head_sha": "bd189fdfa02284f78537b05a4c9a6c8a8469a095",
+      "event": "push",
+      "head_branch": "benchmark/v0.2-p0-github-live",
+      "workflow_path_at_run": ".github/workflows/benchmark-live-github.yml",
+      "head_reachable_from_main": true,
+      "head_tag": "vdb-run-35216991313",
+      "runner_blob_sha_at_head": "a04948971d6293429a0c7c2e08141523f4fa40f9",
+      "triggering_actor": "M12-pixel1"
     },
     {
       "run_id": 35231849182,
@@ -57,7 +65,15 @@
       "artifact_zip_sha256": "bf32fd188aa105390e478414f6fca0c2794aee7c24026459b9f5aed71c64fbf8",
       "raw_evidence_json_sha256": "4ae11eb56ac7997265c4c31eef0cc47d9cca8a5e2a30a5f67b9fa0dc612d3ee2",
       "durable_evidence_path": "evidence/run-35231849182.json",
-      "artifact_expires_at": "2026-12-16T14:10:48Z"
+      "artifact_expires_at": "2026-12-16T14:10:48Z",
+      "head_sha": "1625b7330dd59da400c903cef1a00f378d7b7b68",
+      "event": "push",
+      "head_branch": "benchmark/v0.2-p0-github-repeat-2",
+      "workflow_path_at_run": ".github/workflows/benchmark-live-github-repeat-2.yml",
+      "head_reachable_from_main": false,
+      "head_tag": "vdb-run-35231849182",
+      "runner_blob_sha_at_head": "a04948971d6293429a0c7c2e08141523f4fa40f9",
+      "triggering_actor": "M12-pixel1"
     }
   ],
   "repeatability": {
@@ -107,9 +123,18 @@
   "limitations": [
     "The systems under test are benchmark-defined unsafe and guarded reference behaviors, not a commercial autonomous-agent product.",
     "The external system of record is GitHub Issues; this does not establish generalization to payments, CRM, deployment, or other providers.",
-    "The candidate contains two independent live runs only.",
-    "No customer, production, or personal operational data is used."
+    "The bundle contains two repeated runs started by the same operator from this repository (push-triggered); no independent third-party rerun is included.",
+    "No customer, production, or personal operational data is used.",
+    "In the expired_mandate rows the mandate window, authorization_time and execution_time in the receipt are synthetic values offset from the run start (T0 = start - 20 min); the readback timestamps are the real GitHub timestamps."
   ],
   "result_id": "github-p0-3-repeatability-2026-09-17",
-  "published_on": "2026-09-17"
+  "published_on": "2026-09-17",
+  "provenance_note": "Both runs were triggered by push events to feature branches of this repository, not by the manual workflow_dispatch gate that .github/workflows/benchmark-live-github.yml has on main. The runner blob is identical at both run head commits and at source.main_commit, so the executed code is exactly the one recorded; the trigger differed. Run head commits are tagged vdb-run-<run_id> so they stay fetchable. Fields added 2026-09-21.",
+  "publication_decision": {
+    "pull_request": 22,
+    "merge_commit": "7e4b77447c754f4e83ca8715ee3d70c07d334c30",
+    "merged_by": "M12-pixel1",
+    "merged_at": "2026-09-17T17:16:47Z",
+    "note": "The merge of the pull request into the protected main branch is the record of the publication decision."
+  }
 }

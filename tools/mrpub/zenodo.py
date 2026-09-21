@@ -55,10 +55,10 @@ def description_html(note: Note) -> str:
     items = "".join(f"<li>{e(s)}</li>" for s in unproven)
     return (
         f"<p>{e(' '.join(note.meta['abstract'].split()))}</p>"
-        f"<p><strong>Status:</strong> {e(note.meta['status'])}. This note defines an evaluation framework and "
-        f"reports no benchmark results.</p>"
+        f"<p><strong>Status:</strong> {e(note.meta['status'])}. {e(note.meta['status_sentence'])}</p>"
         f"<p><strong>What remains unproven:</strong></p><ul>{items}</ul>"
-        f"<p>{e(note.series_name)} Note {e(note.number)}, version {e(note.version)}, published by "
+        + " ".join((note.meta["zenodo"].get("description_addendum_html") or "").split())
+        + f"<p>{e(note.series_name)} Note {e(note.number)}, version {e(note.version)}, published by "
         f"{e(note.publisher)}. Canonical page: <a href=\"{e(note.canonical_url)}\">{e(note.canonical_url)}</a>. "
         f"Source and release: <a href=\"{e(note.release_url)}\">{e(note.release_url)}</a>.</p>"
         f"<p>The SHA-256 digests of the files in this record are listed in SHA256SUMS; the same bytes are "
@@ -194,6 +194,139 @@ class Client:
             page += 1
 
 
+PIPELINE_OWNED = ("upload_type", "publication_type", "title", "creators", "description", "publication_date",
+                  "version", "language", "keywords", "notes", "related_identifiers", "references",
+                  "access_right", "license")
+
+
+def description_text(html_text: str) -> str:
+    """Tag-stripped, whitespace-normalised text, which is what Zenodo preserves."""
+    import re
+    return " ".join(html.unescape(re.sub(r"<[^>]+>", " ", html_text or "")).split())
+
+
+def metadata_diff(note: Note, live: dict) -> dict[str, tuple]:
+    """Pipeline-owned fields whose live value differs from what the pipeline generates."""
+    expected = build_metadata(note)
+    diffs = {}
+    live = dict(live)
+    if "resource_type" in live and "upload_type" not in live:
+        # the public records API nests the type; the deposit API uses upload_type/publication_type
+        rt = live.get("resource_type") or {}
+        live["upload_type"], live["publication_type"] = rt.get("type"), rt.get("subtype")
+    for key in PIPELINE_OWNED:
+        want = expected.get(key)
+        have = live.get(key)
+        if key == "description":
+            import re as _re
+            hrefs = lambda t: _re.findall(r'href="([^"]+)"', str(t or ""))  # noqa: E731
+            if description_text(str(have or "")) != description_text(str(want or "")) or hrefs(have) != hrefs(want):
+                diffs[key] = (description_text(str(have or ""))[:200] + f" | links {hrefs(have)}",
+                              description_text(str(want or ""))[:200] + f" | links {hrefs(want)}")
+        elif key == "license":
+            have_id = have.get("id") if isinstance(have, dict) else have
+            if str(have_id or "").lower() != str(want or "").lower():
+                diffs[key] = (have, want)
+        elif key in ("creators", "related_identifiers"):
+            norm = lambda v: [{k: x[k] for k in sorted(x) if k in ("name", "affiliation", "orcid", "identifier", "relation")}  # noqa: E731
+                              for x in (v or [])]
+            if norm(have) != norm(want):
+                diffs[key] = (have, want)
+        elif have != want:
+            diffs[key] = (have, want)
+    return diffs
+
+
+def edit_metadata(note: Note, env: str = "production", apply: bool = False, confirm_doi: str | None = None) -> int:
+    """Bring the PUBLISHED record's metadata in line with the pipeline (no new version, DOI unchanged).
+
+    Dry run by default: prints the differences. --apply --confirm-doi <DOI of the record> performs
+    actions/edit -> PUT metadata -> actions/publish and verifies the result.
+    """
+    rec = note.zenodo_record()
+    if not rec or rec.get("state") != "published":
+        raise PipelineError(f"note {note.number} v{note.version} has no published Zenodo record to edit")
+    if rec.get("environment") != env:
+        raise PipelineError(f"note {note.number} v{note.version} record lives in {rec.get('environment')!r}, not {env!r}")
+    try:
+        client = Client(env)
+    except LookupError:
+        print(token_instructions(note, env))
+        return EXIT_BLOCKED
+    dep = client.get(rec["deposition_id"])
+    if dep.get("state") == "inprogress":
+        raise PipelineError(f"deposition {dep['id']} is already open for editing (state inprogress); "
+                            "discard or publish that edit in the Zenodo UI first")
+    live = dep["metadata"]
+    diffs = metadata_diff(note, live)
+    if not diffs:
+        print(f"Zenodo record {rec['deposition_id']} ({rec.get('doi')}) already matches the pipeline metadata.")
+        return 0
+    print(f"Record {rec['deposition_id']} ({rec.get('doi')}) differs from the pipeline in: {sorted(diffs)}")
+    for key, (have, want) in diffs.items():
+        print(f"  {key}:\n    live:     {str(have)[:300]}\n    pipeline: {str(want)[:300]}")
+    if not apply:
+        print("Dry run. To apply (metadata only, DOI unchanged):\n"
+              f"  python tools/publish.py zenodo-edit-metadata {note.number} --apply --confirm-doi {rec.get('doi')}")
+        return 0
+    if confirm_doi != rec.get("doi"):
+        raise PipelineError(f"--confirm-doi {confirm_doi!r} does not match the record DOI {rec.get('doi')!r}; not editing")
+    new_meta = {k: v for k, v in live.items() if k != "prereserve_doi"}
+    new_meta.update({k: v for k, v in build_metadata(note).items() if k in PIPELINE_OWNED})
+    client._check(client.s.post(f"{client.base}/deposit/depositions/{dep['id']}/actions/edit", timeout=60), 200, 201)
+    try:
+        client.update(dep["id"], new_meta)
+        client.publish(dep["id"])
+    except PipelineError:
+        # never leave the record locked in the edit state with a half-applied change
+        client._check(client.s.post(f"{client.base}/deposit/depositions/{dep['id']}/actions/discard", timeout=60),
+                      200, 201)
+        raise
+    after = client.get(dep["id"])["metadata"]
+    remaining = metadata_diff(note, after)
+    if remaining:
+        raise PipelineError(f"after publishing, these fields still differ: {sorted(remaining)}")
+    rec = dict(rec)
+    rec.setdefault("metadata_edits", []).append({
+        "date": utc_now(), "fields": sorted(diffs), "confirmed_doi": confirm_doi,
+        "via": f"publish.py zenodo-edit-metadata (GitHub Actions run {os.environ['GITHUB_RUN_ID']})"
+        if os.environ.get("GITHUB_RUN_ID") else "publish.py zenodo-edit-metadata (local)",
+    })
+    save_record(note, rec)
+    print(f"Record {rec['deposition_id']} metadata updated and republished; DOI {rec.get('doi')} unchanged; "
+          f"edit recorded in {note.zenodo_path.name}.")
+    return 0
+
+
+def sync_from_workflow(note: Note) -> str:
+    """Copy research/<NNN>/zenodo.json from the newest publish-note run that uploaded it (workflow runs
+    cannot push to the protected main branch, so the record is committed through a pull request)."""
+    import subprocess
+    import tempfile
+    import shutil
+    from pathlib import Path
+    runs = subprocess.run(["gh", "run", "list", "-R", note.repo_slug, "--workflow", "publish-note.yml",
+                           "--limit", "20", "--json", "databaseId,conclusion,createdAt"],
+                          capture_output=True, text=True, encoding="utf-8")
+    if runs.returncode != 0:
+        raise PipelineError(f"gh run list failed: {runs.stderr.strip()}")
+    for run in json.loads(runs.stdout or "[]"):
+        with tempfile.TemporaryDirectory() as tmp:
+            dl = subprocess.run(["gh", "run", "download", str(run["databaseId"]), "-R", note.repo_slug,
+                                 "-n", f"zenodo-{note.number}", "-D", tmp], capture_output=True, text=True)
+            if dl.returncode != 0:
+                continue  # this run did not upload the artifact
+            src = Path(tmp) / note.number / "zenodo.json"
+            if not src.exists():
+                continue
+            shutil.copyfile(src, note.zenodo_path)
+            records = note.zenodo_records()
+            return (f"research/{note.number}/zenodo.json updated from run {run['databaseId']} ({run['createdAt']}): "
+                    + ", ".join(f"v{v} {r.get('state')} {r.get('doi') or r.get('reserved_doi') or ''}".strip()
+                                for v, r in records.items()))
+    raise PipelineError(f"no publish-note run with a zenodo-{note.number} artifact found")
+
+
 def account_status(note: Note, env: str = "production") -> int:
     """Read-only. Workflow logs of a public repository are public, so only depositions that belong
     to this note are described; any other deposition (e.g. unrelated private drafts) is only counted."""
@@ -265,6 +398,10 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
         return EXIT_BLOCKED
 
     record = note.zenodo_record()
+    if record and record.get("environment") != env:
+        raise PipelineError(f"v{note.version} already has a {record.get('environment')} record "
+                            f"({record.get('doi') or record.get('reserved_doi')}); refusing to create a {env} one "
+                            "that would overwrite it in zenodo.json")
     dep = None
     if record and record.get("environment") == env and record.get("version") == note.version:
         dep = client.get(record["deposition_id"])
