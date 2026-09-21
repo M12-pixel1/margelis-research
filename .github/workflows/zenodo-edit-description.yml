@@ -17,7 +17,7 @@ on:
       description_file:
         description: "Path in this branch to the HTML description"
         required: true
-        default: "research/001/zenodo_description_v1.1.html"
+        default: ".github/zenodo/001_description_v1.1.html"
       confirm:
         description: "Type PUBLISH to actually publish (anything else = dry run)"
         required: true
