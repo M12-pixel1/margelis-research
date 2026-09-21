@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://margelis.ai/schemas/verified-action-core-v0.1.schema.json",
+  "title": "Margelis Verified Action Core v0.1",
+  "type": "object",
+  "required": ["contract_version", "authorization", "completion"],
+  "properties": {
+    "contract_version": {
+      "const": "0.1"
+    },
+    "authorization": {
+      "$ref": "#/$defs/authorizationEvidence"
+    },
+    "completion": {
+      "anyOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/completionEvidence"}
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableRef": {
+      "anyOf": [
+        {"$ref": "#/$defs/nonEmptyString"},
+        {"type": "null"}
+      ]
+    },
+    "authorizationEvidence": {
+      "type": "object",
+      "required": [
+        "actor_ref",
+        "principal_ref",
+        "action_type",
+        "action_hash",
+        "scope_ref",
+        "identity_verified",
+        "mandate_ref",
+        "mandate_authenticity_verified",
+        "mandate_scope_matches",
+        "mandate_active_at_execution",
+        "replay_clear_before_execution",
+        "policy_hash",
+        "policy_allows_action",
+        "policy_hash_continuity",
+        "regulated_action",
+        "human_gate_required",
+        "human_gate_satisfied",
+        "authority_rechecked_immediately_before_execution",
+        "material_external_action",
+        "execution_deduplication_ref"
+      ],
+      "properties": {
+        "actor_ref": {"$ref": "#/$defs/nonEmptyString"},
+        "principal_ref": {"$ref": "#/$defs/nonEmptyString"},
+        "action_type": {"$ref": "#/$defs/nonEmptyString"},
+        "action_hash": {"$ref": "#/$defs/nonEmptyString"},
+        "scope_ref": {"$ref": "#/$defs/nonEmptyString"},
+        "identity_verified": {"type": "boolean"},
+        "mandate_ref": {"$ref": "#/$defs/nullableRef"},
+        "mandate_authenticity_verified": {"type": "boolean"},
+        "mandate_scope_matches": {"type": "boolean"},
+        "mandate_active_at_execution": {"type": "boolean"},
+        "replay_clear_before_execution": {"type": "boolean"},
+        "policy_hash": {"$ref": "#/$defs/nullableRef"},
+        "policy_allows_action": {"type": "boolean"},
+        "policy_hash_continuity": {"type": "boolean"},
+        "regulated_action": {"type": "boolean"},
+        "human_gate_required": {"type": "boolean"},
+        "human_gate_satisfied": {"type": "boolean"},
+        "authority_rechecked_immediately_before_execution": {"type": "boolean"},
+        "material_external_action": {"type": "boolean"},
+        "execution_deduplication_ref": {"$ref": "#/$defs/nullableRef"}
+      },
+      "additionalProperties": false
+    },
+    "completionEvidence": {
+      "type": "object",
+      "required": [
+        "authorization",
+        "execution_request_ref",
+        "system_of_record_ref",
+        "verification_source_ref",
+        "outcome_verified",
+        "receipt_ref",
+        "receipt_authenticity_verified",
+        "receipt_binds_action_hash",
+        "receipt_binds_scope",
+        "receipt_binds_mandate",
+        "receipt_binds_policy",
+        "receipt_binds_principal",
+        "receipt_binds_execution"
+      ],
+      "properties": {
+        "authorization": {"$ref": "#/$defs/authorizationEvidence"},
+        "execution_request_ref": {"$ref": "#/$defs/nullableRef"},
+        "system_of_record_ref": {"$ref": "#/$defs/nullableRef"},
+        "verification_source_ref": {"$ref": "#/$defs/nullableRef"},
+        "outcome_verified": {"type": "boolean"},
+        "receipt_ref": {"$ref": "#/$defs/nullableRef"},
+        "receipt_authenticity_verified": {"type": "boolean"},
+        "receipt_binds_action_hash": {"type": "boolean"},
+        "receipt_binds_scope": {"type": "boolean"},
+        "receipt_binds_mandate": {"type": "boolean"},
+        "receipt_binds_policy": {"type": "boolean"},
+        "receipt_binds_principal": {"type": "boolean"},
+        "receipt_binds_execution": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

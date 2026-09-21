@@ -32,9 +32,58 @@ The credential must belong to the dedicated Stripe sandbox. Do not use a live
 Stripe key. The runner fails closed on `sk_live_` / `rk_live_` and on any key
 that is not a test/sandbox secret key.
 
+The workflow confirmation authorizes **running the sandbox benchmark**. It is
+not an action-specific payment mandate from a principal and must not be treated
+as satisfying the Margelis Verified Action Core Human Gate.
+
+## Verified Action Core adapter
+
+The Stripe harness now has a contract-only adapter to the domain-neutral
+**Margelis Verified Action Core v0.1**.
+
+Pinned source:
+
+- repository: `M12-pixel1/agentops-core`;
+- merge commit: `8ea378f4dfc37c42a561010fcfa8265098961a2d`;
+- schema: `schemas/verified_action_core_v0.1.schema.json`;
+- source schema blob: `c919a44ab78093e43a7ac805b40d27e7a6fbec8d`.
+
+Files:
+
+- `verified_action_core_pin.json` — exact upstream contract pin;
+- `verified_action_core_v0.1.schema.json` — pinned machine-readable contract copy;
+- `verified_action_core_adapter.py` — maps Stripe benchmark evidence into that contract;
+- `test_verified_action_core_adapter.py` — offline fail-closed contract test.
+
+The adapter **does not copy the Core decision engine** and does not claim
+`CORE_VERIFIED`. Its output status is:
+
+`VERIFIED_ACTION_CORE_CONTRACT_EXPORT_NOT_CORE_VERIFIED`
+
+This is deliberate. The current Stripe P0-4A benchmark does not yet prove all
+assurances required by the Core. In particular:
+
+- the mandate is hash-bound but not cryptographically verified as a signed payment mandate;
+- the run-level workflow confirmation is not an action-specific payment Human Gate;
+- the benchmark receipt currently has `signature=null`;
+- the receipt does not bind a first-class canonical scope;
+- the receipt does not bind the exact execution request reference;
+- several executed paths do not prove an execution-time authority re-check;
+- several executed paths do not carry an idempotency/deduplication reference.
+
+The adapter exports those gaps instead of filling them with assumptions.
+
 ## Evidence
 
-The workflow emits `vdb-live-stripe-evidence.json` and uploads it as a
-90-day Actions artifact. That artifact remains a **candidate**, not a published
-benchmark result. Publication requires an independent repeat run, durable raw
-evidence, the deterministic result-bundle validator, and a separate Human Gate.
+The live workflow emits two files:
+
+- `vdb-live-stripe-evidence.json` — original P0-4A benchmark evidence;
+- `vdb-live-stripe-verified-action-core.json` — the same evidence mapped into the
+  pinned Verified Action Core contract.
+
+Both are uploaded in the same 90-day Actions artifact.
+
+These artifacts remain **candidates**, not published benchmark results and not
+proof of production payment authority. Publication still requires independent
+repeatability, durable raw evidence, deterministic result-bundle validation and
+a separate Human Gate. Production payment execution is outside this P0 scope.

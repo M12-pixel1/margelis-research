@@ -1,0 +1,15 @@
+{
+  "contract": "Margelis Verified Action Core",
+  "contract_version": "0.1",
+  "source_repository": "M12-pixel1/agentops-core",
+  "source_commit": "8ea378f4dfc37c42a561010fcfa8265098961a2d",
+  "source_schema_path": "schemas/verified_action_core_v0.1.schema.json",
+  "source_schema_blob_sha": "c919a44ab78093e43a7ac805b40d27e7a6fbec8d",
+  "integration_status": "PINNED_CONTRACT_ONLY",
+  "decision_engine_copied": false,
+  "notes": [
+    "This repository validates evidence shape only.",
+    "Authorization and completion decisions remain authoritative in agentops-core.",
+    "The Stripe adapter must not claim CORE_VERIFIED without an external core decision receipt."
+  ]
+}

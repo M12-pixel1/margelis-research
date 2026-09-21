@@ -34,6 +34,10 @@ jobs:
         run: |
           python -m py_compile benchmark/v0.2/live/github_issues_runner.py
           python benchmark/v0.2/live/policy_check.py
+      - name: Stripe Verified Action Core adapter contract
+        run: |
+          python -m py_compile benchmark/v0.2/live/stripe/verified_action_core_adapter.py
+          python benchmark/v0.2/live/stripe/test_verified_action_core_adapter.py
       - name: Checks, byte-for-byte PDF rebuild, secret scan
         env:
           GITHUB_TOKEN: ${{ github.token }}
