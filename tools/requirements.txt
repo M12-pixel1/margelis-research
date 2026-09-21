@@ -5,7 +5,7 @@ PyYAML==6.0.3
 reportlab==4.5.0
 pypdf==6.10.2
 jsonschema==4.26.0
-requests==2.32.5
+requests==2.34.2
 pillow==11.3.0
 # Stripe signed-action contract test (benchmark/v0.2/live/stripe); cffi/pycparser are its
 # transitive dependencies on CPython and must be pinned here for the hash lock.
