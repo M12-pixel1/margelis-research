@@ -1,7 +1,11 @@
-# Update pull requests for the SHA-pinned actions and the pinned Python tools.
-# After merging a pip bump, run `python tools/publish.py lock` so that
-# tools/requirements.lock (hash-pinned, used by every workflow) follows; the
-# repo.dependency_lock check fails until it does.
+# Update pull requests for the SHA-pinned actions; security-only alerts for the Python tools.
+#
+# pip version bumps are deliberately not opened as pull requests: every bump changes
+# tools/requirements.txt without the hash lock, so the repo.dependency_lock guard fails
+# by design, and a reportlab bump changes the bytes of an already published PDF.
+# Dependabot security updates for /tools stay enabled (open-pull-requests-limit: 0
+# disables version updates only). To bump a tool on purpose: edit tools/requirements.txt,
+# run `python tools/publish.py lock`, and open a pull request.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -12,3 +16,4 @@ updates:
     directory: /tools
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
