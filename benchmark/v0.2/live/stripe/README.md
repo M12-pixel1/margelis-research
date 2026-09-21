@@ -87,3 +87,47 @@ These artifacts remain **candidates**, not published benchmark results and not
 proof of production payment authority. Publication still requires independent
 repeatability, durable raw evidence, deterministic result-bundle validation and
 a separate Human Gate. Production payment execution is outside this P0 scope.
+
+## P0-4C signed-action contract (offline cryptographic gate)
+
+The next promotion gate adds cryptographic authority semantics without adding a
+second payment executor.
+
+Files:
+
+- `requirements-signed-action.txt` — isolated benchmark-only crypto dependency;
+- `signed_action.py` — canonical Stripe sandbox action, Ed25519 mandate and
+  role-separated receipt primitives, run-local replay gate;
+- `test_signed_action.py` — fail-closed tamper, wrong-human-confirmation,
+  replay, wrong-execution and signer-role tests.
+
+The contract binds a payment mandate to:
+
+- exact principal;
+- canonical action hash;
+- canonical scope;
+- policy hash;
+- action-specific human-confirmation digest;
+- issue/expiry window;
+- single-use nonce.
+
+The completion receipt binds:
+
+- action hash and scope;
+- mandate;
+- policy;
+- principal;
+- exact execution request;
+- deduplication reference;
+- system-of-record reference;
+- verification source;
+- observed-state digest.
+
+This P0-4C slice is intentionally **offline only**. It does not add a new
+Stripe API caller and does not move even sandbox value by itself. Existing
+P0-4A remains the only Stripe sandbox execution harness.
+
+The signing keys used by the tests are ephemeral benchmark keys generated in
+memory. Passing these tests proves contract cryptography and binding semantics,
+not a production trust root, durable replay ledger, workload identity, or an
+authoritative `agentops-core` decision receipt.
