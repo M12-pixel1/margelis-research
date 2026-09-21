@@ -29,7 +29,7 @@ gh release verify research-note-001-v1.1 -R M12-pixel1/margelis-research
 gh release verify-asset research-note-001-v1.1 Margelis_Research_Note_001.pdf -R M12-pixel1/margelis-research
 
 # rebuild the PDF from source and compare it with the published digest
-python -m pip install --require-hashes -r tools/requirements.lock
+python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.lock
 python tools/publish.py verify 001 --rebuild
 ```
 
@@ -37,7 +37,8 @@ python tools/publish.py verify 001 --rebuild
 
 - `python tools/publish.py check` scans every publishable file for credentials,
   private file-system paths, internal host names, IP addresses, e-mail addresses
-  and phone numbers, and the `validate` workflow runs it on every push.
+  and phone numbers, and the `validate` workflow (the required status check for
+  `main`) runs it on every pull request and on every merge.
 - GitHub secret scanning with push protection and Dependabot alerts are enabled
   for this repository; `main` accepts changes only through pull requests that
   pass `validate`, and releases are immutable.

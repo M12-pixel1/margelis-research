@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.14"
       - name: Install hash-pinned tools
-        run: python -m pip install --require-hashes -r tools/requirements.lock
+        run: "python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.lock"
       - name: Canonical receipt branch tests
         run: python tools/test_probe_canonical.py
       - name: Zenodo flow tests (simulated API)

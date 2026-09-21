@@ -35,7 +35,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from mrpub import build, checks, lock, receipt, release, zenodo  # noqa: E402
-from mrpub.common import RESEARCH, PipelineError, all_notes, load_note, write_text  # noqa: E402
+from mrpub.common import RESEARCH, PipelineError, all_notes, load_note, load_series, write_text  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -69,12 +69,16 @@ def run_checks(numbers: list[str], online: bool, rebuild: bool = False, only: st
         ("repo.license_display_contract", lambda: [checks.check_license_display_contract()]),
         ("repo.docs_current", lambda: [checks.check_docs_current()]),
         ("repo.dependency_lock", lambda: [checks.check_dependency_lock()]),
+        ("repo.workflow_pins", lambda: [checks.check_workflow_pins()]),
         ("repo.internal_links", lambda: [checks.check_internal_links()]),
         ("repo.secret_scan", lambda: [checks.check_secrets()]),
     ]
     for prefix, fn in repo_checks:
         if only is None or only.startswith(prefix) or prefix.startswith(only):
-            results += fn()
+            try:
+                results += fn()
+            except Exception as exc:  # a crashing check is a failing check, never a missing one
+                results.append(checks.Result(prefix.rstrip("."), "FAIL", f"{type(exc).__name__}: {exc}"))
     return [r for r in results if wanted(r.id)] if only else results
 
 
@@ -83,16 +87,43 @@ def cmd_new(args) -> int:
     d = RESEARCH / num
     if d.exists():
         raise PipelineError(f"{d} already exists")
-    template = (RESEARCH / "001" / "note.yaml").read_text(encoding="utf-8")
-    head, _, _ = template.partition("abstract:")
-    head = (head.replace('number: "001"', f'number: "{num}"')
-                .replace('version: "1.0"', 'version: "1.0"')
-                .replace("title: From Mandate to Verified Outcome", f"title: {args.title}")
-                .replace("subtitle: An Evaluation Framework for Autonomous Agent Execution",
-                         f"subtitle: {args.subtitle}")
-                .replace("Research Note 001", f"Research Note {num}")
-                .replace("research/001/", f"research/{num}/")
-                .replace("build 001", f"build {num}"))
+    import datetime as dt
+    series = load_series()
+    author = load_note("001").authors[0] if (RESEARCH / "001" / "note.yaml").exists() else \
+        {"given_name": "Given", "family_name": "Family", "affiliation": series["publisher"]}
+    today = dt.date.today().isoformat()
+    # a fixed template: nothing is inherited from another note's file
+    head = f"""# Input metadata for {series['series']} Note {num}. metadata.json, SHA256SUMS, CITATION.cff,
+# the README files and the web pages are generated from it by `python tools/publish.py build {num}`.
+# Released fields are never edited in place: a change needs a new version_history entry.
+
+number: "{num}"
+version: "1.0"
+date: "{today}"
+
+title: {args.title}
+subtitle: {args.subtitle}
+
+authors:
+  - given_name: {author['given_name']}
+    family_name: {author['family_name']}
+    affiliation: {author['affiliation']}
+    orcid: null
+
+language: en
+publication_type: research note
+status: TODO (e.g. Concept + Evaluation Framework)
+# One sentence shown on the web page, in the release notes and in the archive record:
+# what this note is and what it does not report.
+status_sentence: TODO (at least 20 characters).
+# Number of Markdown tables the note must contain (0 if none is required).
+required_tables: 0
+
+zenodo:
+  upload_type: publication
+  publication_type: technicalnote
+
+"""
     write_text(d / "note.yaml", head + """abstract: >-
   TODO: one-paragraph abstract (at least 40 characters).
 
@@ -116,9 +147,9 @@ locked_statements:
 
 version_history:
   - version: "1.0"
-    date: "YYYY-MM-DD"
+    date: "%s"
     summary: Initial publication.
-""")
+""" % today)
     write_text(d / f"Margelis_Research_Note_{num}.md", f"""MARGELIS RESEARCH
 
 # {args.title}
@@ -137,9 +168,9 @@ Research Note {num} · v1.0 · D Month YYYY
 
 TODO
 
-## 2. Prior art
+## 2. References
 
-1. TODO: verified reference with URL.
+1. TODO: verified reference with URL. (Use the heading "References"; see series.yaml.)
 
 ## 3. What remains unproven
 

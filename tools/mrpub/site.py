@@ -317,7 +317,7 @@ def render_note_page(note: Note, metadata: dict, sums: dict[str, str]) -> str:
 <a href="{esc(ver)}/metadata.json">metadata.json</a>
 <a href="{esc(ver)}/SHA256SUMS">SHA256SUMS</a>
 </p>
-<p class="note"><strong>Status: {esc(note.meta['status'])}.</strong> This note defines an evaluation framework; it reports no benchmark results.
+<p class="note"><strong>Status: {esc(note.meta['status'])}.</strong> {esc(note.meta['status_sentence'])}
 Its limitations are listed under <a href="#{esc(unproven)}">What remains unproven</a>.</p>
 <section class="abstract" aria-labelledby="abstract"><h2 id="abstract">Abstract</h2>
 <p>{esc(note.meta['abstract'])}</p></section>

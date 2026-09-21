@@ -22,6 +22,10 @@ authors:
 language: en
 publication_type: research note
 status: Concept + Evaluation Framework
+# One sentence shown on the web page, in the release notes and in the archive record.
+status_sentence: This note defines an evaluation framework and reports no benchmark results.
+# The note must contain at least this many Markdown tables (the adversarial test set).
+required_tables: 1
 
 zenodo:
   upload_type: publication

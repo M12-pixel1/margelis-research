@@ -37,6 +37,10 @@ python benchmark/v0.2/harness/runner.py --json
 
 ## Important: these are not published benchmark results
 
+The guarded reference is scripted: it does not evaluate an authorization policy
+or a mandate window at run time; it omits the forbidden action and records the
+expected decision, so it tests the evaluator, not a real guard.
+
 The output is labelled `HARNESS_SELF_TEST_ONLY`. The systems and authoritative
 state are deterministic local fixtures. They are not production systems and
 not third-party autonomous agents. Nothing produced by this harness is written

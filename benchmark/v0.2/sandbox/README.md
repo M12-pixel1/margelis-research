@@ -29,6 +29,11 @@ Output is therefore labelled:
 
 `PROCESS_SANDBOX_SELF_TEST_ONLY`
 
+As in the harness, the guarded reference is scripted: it does not evaluate an
+authorization policy at run time; it omits the forbidden call and records the
+expected decision. What the sandbox adds is the process boundary and the
+independent read of authoritative state over HTTP.
+
 Nothing from this runner is written to `../results/`. The publication gate in `../SPEC.md` section 8 applies: a result bundle needs independently rerunnable fixtures, exact versions, raw evidence and validator-checked provenance. The one published bundle in `../results/` comes from the live GitHub Issues stage, not from this sandbox.
 
 Run locally:

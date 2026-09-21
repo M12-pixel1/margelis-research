@@ -21,7 +21,11 @@ Both "systems" are code paths inside the single runner process
 guarded path does not evaluate an authorization policy; it omits the forbidden
 API call. The readback is a GET issued by the same process, so it is an
 independent observation of the external state but not a verifier component
-separate from the executor in the sense of `../SPEC.md` section 2.
+separate from the executor in the sense of `../SPEC.md` section 2. The runner
+records the SHA-256 of the three scenario files (`scenario_hashes`) to bind the
+evidence to the scenario definitions in force at run time; its pass/fail
+predicates are written in the runner itself and are not evaluated from the YAML
+the way `../harness/runner.py` does.
 
 ## Safety boundary
 

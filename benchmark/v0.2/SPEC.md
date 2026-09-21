@@ -5,8 +5,9 @@ external-system harnesses.** This document and the files next to it define the
 benchmark format. One repeatability-backed GitHub Issues P0-3 result bundle is
 published under `results/`; its systems under test are repository-defined
 reference behaviours against an external system of record, and no result about
-a production or third-party agent system is published. Stripe P0-4A remains an
-unpublished live-sandbox candidate. Nothing here is an industry standard.
+a production or third-party agent system is published. The Stripe P0-4A stage
+has not been run; no candidate or result exists for it. Nothing here is an
+industry standard.
 
 The benchmark operationalizes
 [Margelis Research Note 001](../../research/001/Margelis_Research_Note_001.md)

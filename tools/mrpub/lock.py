@@ -15,11 +15,11 @@ REQUIREMENTS = TOOLS / "requirements.txt"
 LOCK = TOOLS / "requirements.lock"
 PYPI = "https://pypi.org/pypi/{name}/{version}/json"
 PY_TAG = "cp314"
-PLATFORMS = ("manylinux", "win_amd64")
+PLATFORMS = ("manylinux", "win_amd64", "macosx")
 
 HEADER = """# Hash-pinned lock of tools/requirements.txt and its transitive dependencies.
-# Generated from the PyPI JSON API (file digests) for CPython 3.14 on manylinux x86_64 and
-# win_amd64 plus pure-Python wheels and sdists. Install with:
+# Generated from the PyPI JSON API (file digests) for CPython 3.14 on manylinux (x86_64,
+# aarch64), win_amd64 and macOS (x86_64, arm64) plus pure-Python wheels and sdists. Install with:
 #   python -m pip install --require-hashes -r tools/requirements.lock
 # Regenerate with: python tools/publish.py lock   (after changing tools/requirements.txt)
 """
@@ -57,7 +57,7 @@ def _wanted(filename: str) -> bool:
     if "py3-none-any" in filename:
         return True
     return (PY_TAG in filename or "abi3" in filename) and any(p in filename for p in PLATFORMS) \
-        and ("x86_64" in filename or "win_amd64" in filename)
+        and any(arch in filename for arch in ("x86_64", "win_amd64", "arm64", "aarch64", "universal2"))
 
 
 def _requirement_names(requires_dist: list[str]) -> list[str]:

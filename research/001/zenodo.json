@@ -81,7 +81,16 @@
       "doi_url": "https://doi.org/10.5281/zenodo.22806682",
       "record_url": "https://zenodo.org/record/22806682",
       "concept_doi": "10.5281/zenodo.22806277",
-      "published_at": "2026-09-17T06:30:45Z"
+      "published_at": "2026-09-17T06:30:45Z",
+      "metadata_edits": [
+        {
+          "date": "2026-09-21T05:18:37Z",
+          "fields": [
+            "description"
+          ],
+          "via": "one-off workflow zenodo-edit-description.yml (GitHub Actions run 35564098815), outside the pipeline; the added paragraph is now note.yaml zenodo.description_addendum_html"
+        }
+      ]
     }
   }
 }

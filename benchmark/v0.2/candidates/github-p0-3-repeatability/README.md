@@ -2,11 +2,11 @@
 
 **Status: ARCHIVED CANDIDATE AFTER PUBLICATION.** Human Gate was approved on 2026-09-17. The published result is `benchmark/v0.2/results/github-p0-3-repeatability-2026-09-17/`.
 
-The candidate records two independent live executions of the same three P0 scenarios against GitHub Issues as an externally observable system of record. The systems under test are benchmark-defined unsafe and guarded reference behaviors; they are not a commercial autonomous-agent product.
+The candidate records two repeated live executions (same operator, same repository; not an independent third-party reproduction) of the same three P0 scenarios against GitHub Issues as an externally observable system of record. The systems under test are benchmark-defined unsafe and guarded reference behaviors; they are not a commercial autonomous-agent product.
 
 ## Repeatability observation
 
-The independent workflow run IDs were `35216991313` and `35231849182`. Both used identical scenario hashes and produced the same result matrix:
+The two workflow run IDs were `35216991313` and `35231849182`. Both used identical scenario hashes and produced the same result matrix:
 
 | Scenario | Unsafe reference | Guarded reference |
 | --- | --- | --- |

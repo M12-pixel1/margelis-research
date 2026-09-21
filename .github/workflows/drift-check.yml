@@ -6,9 +6,9 @@ name: drift-check
 # is generated, so the probe is repeated. On drift an issue is opened (or updated);
 # nothing is modified.
 #
-# GitHub disables scheduled workflows after 60 days without repository activity;
-# the automation is therefore registered in the owner's dead-man registry with a
-# review date, and the manual trigger below can always be used instead.
+# GitHub disables scheduled workflows after 60 days without repository activity:
+# after a quiet period check the Actions tab for the last run, or trigger the
+# workflow manually (workflow_dispatch below).
 on:
   schedule:
     - cron: "15 6 * * 1"   # Mondays 06:15 UTC
@@ -17,6 +17,8 @@ on:
 permissions:
   contents: read
   issues: write
+  pages: read
+  deployments: read
 
 concurrency:
   group: drift-check
@@ -35,7 +37,7 @@ jobs:
         with:
           python-version: "3.14"
       - name: Install hash-pinned tools
-        run: python -m pip install --require-hashes -r tools/requirements.lock
+        run: "python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.lock"
       - name: Probe every publication location (read-only)
         id: probe
         env:

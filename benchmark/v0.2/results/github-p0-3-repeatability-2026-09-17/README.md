@@ -28,6 +28,8 @@ The exact runner is `benchmark/v0.2/live/github_issues_runner.py` at blob `a0494
 
 How the two runs were actually triggered (recorded from the GitHub Actions run metadata; see `runs[]` in `manifest.json`): run `35216991313` was a `push` event on branch `benchmark/v0.2-p0-github-live` at commit `bd189fd` (tag `vdb-run-35216991313`, on `main`); run `35231849182` was a `push` event on branch `benchmark/v0.2-p0-github-repeat-2` at commit `1625b73` (tag `vdb-run-35231849182`, not part of the `main` history), through a copy of the workflow named `benchmark-live-github-repeat-2.yml`. Neither run went through the `workflow_dispatch` confirmation gate that the workflow on `main` has today. The runner blob is identical at both run commits and at the `main` commit above, so the code that executed is exactly the one recorded.
 
+In the `expired_mandate` rows the mandate window, `authorization_time` and `execution_time` inside the receipt are synthetic values offset from the run start (T0 = start − 20 min); the readback timestamps are the real GitHub timestamps, which is why they are later than the receipt's execution time.
+
 Both evidence files carry `result_status: LIVE_EXTERNAL_SYSTEM_CANDIDATE_NOT_PUBLISHED` and a `publication_warning`. The runner writes these labels at execution time, before any publication decision, and the files are kept byte-exact so the SHA-256 digests above remain valid; the publication status of this bundle is the `status` field of `manifest.json`. The original Actions artifacts are retained until 2026-12-16; after that only the archived JSON files and their digests remain verifiable.
 
 ## Independent rerun
@@ -51,3 +53,7 @@ This validated bundle is published at `benchmark/v0.2/results/github-p0-3-repeat
 Published by the repository owner's merge of pull request [#22](https://github.com/M12-pixel1/margelis-research/pull/22) into the protected `main` branch on 2026-09-17 (merge commit `7e4b7744`), after two repeated live runs, durable raw-evidence archival, deterministic result-bundle validation, negative validator tests and a green required CI run. The merge record is the evidence of that decision.
 
 The limitations above remain part of the published result and must travel with any citation or comparison.
+
+## Revisions of this README
+
+- 2026-09-21 (pull request #28): trigger provenance of both runs added (`runs[].head_sha`, `event`, `head_branch`, `workflow_path_at_run`, tags `vdb-run-<id>`); "two independent runs" reworded to "two repeated runs by the same operator"; the publication decision now cites the PR #22 merge; the synthetic receipt timestamps of the expired-mandate rows are disclosed. The evidence files and their digests are unchanged.

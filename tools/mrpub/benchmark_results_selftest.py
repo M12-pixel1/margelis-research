@@ -5,8 +5,8 @@ import json
 import tempfile
 from pathlib import Path
 
-from .benchmark_results import validate_results_dir
-from .common import git, sha256_file, write_json, write_text
+from .benchmark_results import _evidence_digest, validate_results_dir
+from .common import git, load_json, sha256_file, write_json, write_text
 
 SCENARIOS = ("expired_mandate", "replay", "false_done")
 
@@ -41,9 +41,14 @@ def _make_bundle(root: Path, results: Path) -> Path:
         issues = [idx * 10 + n for n in range(1, 6)]
         cleanup = [{"number": n, "state": "closed"} for n in issues]
         rows = []
+        example = load_json(root / "schemas" / "examples" / "receipt.synthetic-example.unverified.json")
         for scenario in SCENARIOS:
-            rows.append({"scenario": scenario, "system": "unsafe", "pass": False})
-            rows.append({"scenario": scenario, "system": "guarded", "pass": True})
+            for system, passed in (("unsafe", False), ("guarded", True)):
+                evidence = [{"synthetic": True, "scenario": scenario, "system": system}]
+                receipt = dict(example, receipt_id=f"synthetic-{run_id}-{scenario}-{system}",
+                               evidence_hashes=[_evidence_digest(item) for item in evidence])
+                rows.append({"scenario": scenario, "system": system, "pass": passed,
+                             "receipt": receipt, "evidence": evidence})
         evidence = {
             "run_id": str(run_id),
             "scenario_hashes": scenario_hashes,
@@ -55,6 +60,8 @@ def _make_bundle(root: Path, results: Path) -> Path:
         write_json(evidence_path, evidence)
         runs.append({
             "run_id": run_id,
+            "head_sha": commit,
+            "event": "workflow_dispatch",
             "acceptance": acceptance,
             "issues": issues,
             "raw_evidence_json_sha256": sha256_file(evidence_path),

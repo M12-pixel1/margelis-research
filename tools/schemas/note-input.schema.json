@@ -13,6 +13,7 @@
     "language",
     "publication_type",
     "status",
+    "status_sentence",
     "zenodo",
     "abstract",
     "keywords",
@@ -86,6 +87,14 @@
     },
     "status": {
       "type": "string"
+    },
+    "status_sentence": {
+      "type": "string",
+      "minLength": 20
+    },
+    "required_tables": {
+      "type": "integer",
+      "minimum": 0
     },
     "zenodo": {
       "type": "object",

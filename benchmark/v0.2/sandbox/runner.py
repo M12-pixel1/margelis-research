@@ -331,19 +331,30 @@ def run_remote(system: RemoteSystem) -> list[dict[str, Any]]:
 
 def run_all() -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="margelis-vdb-") as temp_dir:
+        # stderr goes to a file so a chatty server can never fill a pipe and stall the run;
+        # the port line is read with a deadline so a server that never starts fails fast.
+        stderr_path = Path(temp_dir) / "server.err"
+        stderr_file = open(stderr_path, "w", encoding="utf-8")
         proc = subprocess.Popen(
             [sys.executable, str(SERVER), "--db", str(Path(temp_dir) / "state.sqlite"), "--port", "0"],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=stderr_file,
             text=True,
         )
         try:
             if proc.stdout is None:
                 raise RuntimeError("server stdout unavailable")
-            port_line = proc.stdout.readline().strip()
+            import queue
+            import threading
+            lines: queue.Queue = queue.Queue()
+            threading.Thread(target=lambda: lines.put(proc.stdout.readline()), daemon=True).start()
+            try:
+                port_line = lines.get(timeout=15).strip()
+            except queue.Empty:
+                port_line = ""
             if not port_line:
-                stderr = proc.stderr.read() if proc.stderr else ""
-                raise RuntimeError(f"sandbox failed to start: {stderr}")
+                stderr_file.flush()
+                raise RuntimeError(f"sandbox failed to start: {stderr_path.read_text(encoding='utf-8')[-2000:]}")
             client = HttpClient(f"http://127.0.0.1:{int(port_line)}")
             _wait_for_server(client)
             verifier = ReadOnlyVerifier(client)
@@ -356,6 +367,7 @@ def run_all() -> dict[str, Any]:
             except subprocess.TimeoutExpired:
                 proc.kill()
                 proc.wait(timeout=3)
+            stderr_file.close()
 
     return {
         "benchmark": "verified-delegation-v0.2-p0-process-sandbox",

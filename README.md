@@ -3,7 +3,8 @@
 Technical research notes and a draft benchmark specification published by
 Rūpestėlis Holding. Every published note is archived with a DOI, released as a
 locked GitHub release and served from a canonical web page; every file can be
-verified by its SHA-256 digest and rebuilt byte for byte from this repository.
+verified by its SHA-256 digest, and the PDF can be rebuilt byte for byte from
+the Markdown source in this repository.
 
 ## Notes
 
@@ -37,7 +38,8 @@ receipts or verified outcomes are new; each note lists its prior art.
 [`benchmark/v0.2/`](benchmark/v0.2/) holds the draft specification of the
 Verified Delegation Benchmark (ten machine-readable scenarios, a scenario schema
 and a draft receipt schema), an executable P0 harness, a process-isolated sandbox
-and a manual-only live stage against GitHub Issues. [`benchmark/v0.2/results/`](benchmark/v0.2/results/)
+and two manual-only live stages (GitHub Issues; a Stripe test sandbox that has
+not been run yet). [`benchmark/v0.2/results/`](benchmark/v0.2/results/)
 lists the published result bundles; each bundle carries its raw evidence, its
 provenance and its own limitations, which are normative. The systems under test
 in the published bundle are repository-defined reference behaviours, not
@@ -51,6 +53,11 @@ commercial agent products.
 - Each version has its own DOI; the "all versions" DOI always resolves to the latest version.
 - To report an error in a note, open an issue in this repository. Accepted
   corrections are listed in the version history of the note and in the release notes.
+- Metadata of a published archive record (description, keywords, related
+  identifiers) may be aligned with `note.yaml` through
+  `publish.py zenodo-edit-metadata NNN --apply --confirm-doi <DOI>`; the files
+  and the DOI never change, and every such edit is appended to
+  `research/NNN/zenodo.json` under `metadata_edits`.
 
 ## Repository layout
 
@@ -62,7 +69,8 @@ benchmark/v0.2/        SPEC.md, scenarios/, schemas/, harness/, sandbox/, live/,
 site/                  generated static pages (deployed to the mirror and the canonical host)
 tools/                 publication pipeline, schemas, hash-pinned dependencies, bundled fonts
 .github/workflows/     validate (required check), pages (mirror), publish-note (manual),
-                       drift-check (weekly re-verification), benchmark-live-github (manual)
+                       drift-check (weekly re-verification), benchmark-live-github (manual),
+                       benchmark-live-stripe (manual; needs a sandbox secret, never run yet)
 ```
 
 ## Verify a published note
@@ -70,9 +78,19 @@ tools/                 publication pipeline, schemas, hash-pinned dependencies, 
 ```bash
 sha256sum -c SHA256SUMS                                  # next to the downloaded files
 gh release verify research-note-001-v1.1 -R M12-pixel1/margelis-research
-python -m pip install --require-hashes -r tools/requirements.lock
+python -m pip install --require-hashes --only-binary=:all: -r tools/requirements.lock
 python tools/publish.py verify 001 --rebuild --online    # all checks + byte-for-byte PDF rebuild
 ```
+
+The lock carries wheel hashes for CPython 3.14 on Linux (x86_64, aarch64), Windows
+(x86_64) and macOS (x86_64, arm64). On another interpreter or platform use
+`pip install -r tools/requirements.txt` (same versions, no hash check); the PDF
+digest comparison is what proves reproducibility either way.
+
+Note structure rules enforced by `check`: one H1; numbered `## N.` sections in
+sequence, unnumbered sections last; the sections listed in `series.yaml`
+(`Prior art` or `References`, `What remains unproven`); at least
+`required_tables` Markdown tables (from `note.yaml`); no raw HTML or images.
 
 ## Publish a new note
 
@@ -82,20 +100,31 @@ workflow; nothing is pushed to `main` directly.
 ```bash
 python tools/publish.py new 002 --title "..." --subtitle "..."
 # edit research/002/note.yaml, the Markdown file and references.json
+python tools/publish.py grant-license 002 --spdx CC-BY-4.0 --by "<name>" --on YYYY-MM-DD   # human decision
 ./publish-research-note 002                 # build + all checks; stops before publication
 git checkout -b note-002 && git add -A && git commit -m "Research Note 002 v1.0" && git push -u origin note-002
-gh pr create                                # merge after `validate` passes
-python tools/publish.py release 002         # locked GitHub release, assets verified after upload
-# Zenodo (needs the ZENODO_ACCESS_TOKEN repository secret): run the publish-note workflow
-# with action zenodo-draft, review the private draft, then zenodo-publish with the reserved DOI
-python tools/publish.py zenodo-sync 002     # bring zenodo.json into the working tree
-python tools/publish.py build 002 && python tools/publish.py receipt 002   # DOI into page, CITATION.cff, receipt
+gh pr create                                # first PR: the note; merge after `validate` passes
+python tools/publish.py release 002         # locked GitHub release from the merged commit, assets verified
+# Zenodo: run the publish-note workflow with action zenodo-draft, review the private draft on
+# zenodo.org, then run zenodo-publish with the reserved DOI (irreversible)
+python tools/publish.py zenodo-sync 002     # bring the record (DOI) into the working tree
+python tools/publish.py build 002           # DOI into the page, README files and CITATION.cff
+python tools/publish.py receipt 002         # probe every location, write publication-receipt.json
+git checkout -b note-002-doi && git add -A && git commit -m "Research Note 002: DOI" && git push -u origin note-002-doi
+gh pr create                                # second PR: DOI and receipt; merge, then deploy the canonical host
+python tools/publish.py release 002 --update-notes   # release notes now show the DOI
 ```
 
 Human decisions that the pipeline never makes on its own: granting the license
 (`publish.py grant-license`), publishing the Zenodo record (irreversible, needs
 the reserved DOI typed back), and deploying to the canonical host (a private
-script outside this repository).
+script outside this repository; its contract is in [`site/README.md`](site/README.md)).
+
+Zenodo token: the repository secret `ZENODO_ACCESS_TOKEN` (scopes
+`deposit:write` and `deposit:actions`) of the Zenodo account that owns the
+Margelis Research records; the `publish-note` workflow is the sanctioned path.
+A new version of an existing note must be created with that same account,
+because Zenodo ties versions to the concept DOI of the account that created it.
 
 Rules the pipeline enforces:
 
@@ -108,7 +137,10 @@ Rules the pipeline enforces:
   the Zenodo step keeps the draft closed and refuses to publish.
 - Every publishable file is scanned for credentials and private operational data,
   and every guard is exercised with an injected defect in CI (`tools/test_checks_negative.py`).
-- A weekly workflow re-probes every publication location and opens an issue on drift.
+- A weekly workflow (`drift-check`, also runnable by hand) re-probes every
+  publication location and opens an issue on drift; GitHub suspends the schedule
+  after 60 days without commits, so its last run date is part of the owner's
+  review checklist.
 
 ## Not in this repository
 

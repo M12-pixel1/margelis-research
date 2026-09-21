@@ -402,6 +402,7 @@ def run() -> dict[str, Any]:
         {"returned_ids": [guarded_rep_1["id"], guarded_rep_2["id"]]},
         {"matching_succeeded_effect_count": len(guarded_rep_effects)},
         {"readbacks": [selected_intent(x) for x in guarded_rep_effects]},
+        {"idempotent_replay": guarded_rep_1["id"] == guarded_rep_2["id"]},
     ]
     action = payment_action("replay-guarded")
     rows.append(
@@ -418,8 +419,10 @@ def run() -> dict[str, Any]:
                 mandate_id="mandate:vdb-p0-4a-replay",
                 executor="stripe-guarded",
                 action=action,
-                decision="DENY",
-                executed_action=None,
+                # the replay IS delivered (same Idempotency-Key); Stripe makes it a no-op, so this is
+                # the "ALLOW as an idempotent no-op" case of scenarios/replay.yaml, not a DENY
+                decision="ALLOW",
+                executed_action=action,
                 outcome="NOT_EXECUTED",
                 external_ref=guarded_rep_1["id"],
                 verifier="stripe-api:LIST-payment_intents",
@@ -453,7 +456,8 @@ def run() -> dict[str, Any]:
         {
             "scenario": "false_done",
             "system": "unsafe",
-            "pass": False,
+            # the self-report "DONE" is only correct if the authoritative object really succeeded
+            "pass": authoritative_success,
             "expected": "FAIL",
             "receipt": make_receipt(
                 receipt_id=f"stripe-{run_id}-false-done-unsafe",

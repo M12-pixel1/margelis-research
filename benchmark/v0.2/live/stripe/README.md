@@ -22,6 +22,14 @@ The four P0-4A cases are:
 TOCTOU is a provider-specific P0-4A extension and is not yet promoted into the
 core v0.2 scenario catalogue.
 
+Both "systems" are code paths inside the single runner process, authenticated
+with the same sandbox key. The guarded path does not evaluate an authorization
+policy or re-check authority at run time; it omits the forbidden POST (recording
+`REAUTHORIZATION_REQUIRED`) or, for replay, repeats the POST with the same
+Stripe idempotency key and records the delivery as an idempotent no-op. The
+LIST/GET readbacks are issued by the same process. This stage has not been run;
+no candidate or result exists for it.
+
 ## Human gate
 
 The live workflow is manual-only. It requires the exact confirmation string

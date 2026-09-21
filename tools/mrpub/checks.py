@@ -176,8 +176,9 @@ class NoteChecks:
             if not any(alt.strip() in present for alt in req.split("|")):
                 problems.append(f"missing required section '{req}'")
         tables = [t for t in self.body_tokens if t.type == "table_open"]
-        if not tables:
-            problems.append("adversarial test-set table not found")
+        need = int(self.note.meta.get("required_tables", 0) or 0)
+        if len(tables) < need:
+            problems.append(f"{len(tables)} Markdown table(s) found; note.yaml requires {need}")
         return (FAIL, "; ".join(problems)) if problems else \
             (PASS, f"1 H1, {len(numbered)} numbered sections + {len(h2) - len(numbered)} end section(s), {len(tables)} table(s)")
 
@@ -246,9 +247,10 @@ class NoteChecks:
             ok, info = fetch_ok(u)
             if ok:
                 continue
-            # 4xx = the resource is gone or moved (link rot): fail. 5xx or no connection = the host is
-            # down right now: warn, so that an outage elsewhere does not block unrelated merges.
-            (gone if re.fullmatch(r"HTTP 4\d\d", info) else transient).append(f"{u} ({info})")
+            # 404/410 = the resource is gone (link rot): fail. 403/429 (bot blocking, rate limits), 5xx or
+            # no connection = the host is refusing right now: warn, so an outage elsewhere never blocks
+            # unrelated merges.
+            (gone if info in ("HTTP 404", "HTTP 410") else transient).append(f"{u} ({info})")
         if gone:
             return FAIL, f"gone: {gone}" + (f"; unreachable now: {transient}" if transient else "")
         if transient:
@@ -729,7 +731,12 @@ def check_docs_current() -> Result:
             problems.append("README.md notes block is out of date (run `publish.py build`)")
     for n in notes:
         path = n.dir / "README.md"
-        if not path.exists() or path.read_text(encoding="utf-8") != research_readme(n):
+        try:
+            expected = research_readme(n)
+        except ValueError as exc:  # e.g. the scaffold's placeholder date
+            problems.append(f"research/{n.number}/note.yaml: {exc} (fill in the dates)")
+            continue
+        if not path.exists() or path.read_text(encoding="utf-8") != expected:
             problems.append(f"research/{n.number}/README.md is out of date (run `publish.py build`)")
     for n in notes:
         stale = re.findall(rf"research-note-{n.number}-v(\d+\.\d+)", readme)
@@ -739,6 +746,22 @@ def check_docs_current() -> Result:
     return Result("repo.docs_current", FAIL if problems else PASS,
                   "; ".join(problems) if problems else
                   f"README files describe the current version of {len(notes)} note(s)")
+
+
+def check_workflow_pins() -> Result:
+    """Every action a workflow uses must be pinned to a full commit SHA."""
+    problems, count = [], 0
+    for wf in sorted((ROOT / ".github" / "workflows").glob("*.yml")):
+        for lineno, line in enumerate(wf.read_text(encoding="utf-8").splitlines(), 1):
+            m = re.search(r"^\s*-?\s*uses:\s*([^\s#]+)", line)
+            if not m:
+                continue
+            count += 1
+            ref = m.group(1).rsplit("@", 1)
+            if len(ref) != 2 or not re.fullmatch(r"[0-9a-f]{40}", ref[1]):
+                problems.append(f"{wf.name}:{lineno}: {m.group(1)} is not pinned to a 40-hex commit")
+    return Result("repo.workflow_pins", FAIL if problems else PASS,
+                  "; ".join(problems) if problems else f"{count} action references pinned to full commit SHAs")
 
 
 def check_dependency_lock() -> Result:

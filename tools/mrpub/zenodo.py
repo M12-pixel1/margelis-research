@@ -55,8 +55,7 @@ def description_html(note: Note) -> str:
     items = "".join(f"<li>{e(s)}</li>" for s in unproven)
     return (
         f"<p>{e(' '.join(note.meta['abstract'].split()))}</p>"
-        f"<p><strong>Status:</strong> {e(note.meta['status'])}. This note defines an evaluation framework and "
-        f"reports no benchmark results.</p>"
+        f"<p><strong>Status:</strong> {e(note.meta['status'])}. {e(note.meta['status_sentence'])}</p>"
         f"<p><strong>What remains unproven:</strong></p><ul>{items}</ul>"
         + " ".join((note.meta["zenodo"].get("description_addendum_html") or "").split())
         + f"<p>{e(note.series_name)} Note {e(note.number)}, version {e(note.version)}, published by "
@@ -219,8 +218,11 @@ def metadata_diff(note: Note, live: dict) -> dict[str, tuple]:
         want = expected.get(key)
         have = live.get(key)
         if key == "description":
-            if description_text(str(have or "")) != description_text(str(want or "")):
-                diffs[key] = (description_text(str(have or ""))[:200], description_text(str(want or ""))[:200])
+            import re as _re
+            hrefs = lambda t: _re.findall(r'href="([^"]+)"', str(t or ""))  # noqa: E731
+            if description_text(str(have or "")) != description_text(str(want or "")) or hrefs(have) != hrefs(want):
+                diffs[key] = (description_text(str(have or ""))[:200] + f" | links {hrefs(have)}",
+                              description_text(str(want or ""))[:200] + f" | links {hrefs(want)}")
         elif key == "license":
             have_id = have.get("id") if isinstance(have, dict) else have
             if str(have_id or "").lower() != str(want or "").lower():
@@ -244,12 +246,17 @@ def edit_metadata(note: Note, env: str = "production", apply: bool = False, conf
     rec = note.zenodo_record()
     if not rec or rec.get("state") != "published":
         raise PipelineError(f"note {note.number} v{note.version} has no published Zenodo record to edit")
+    if rec.get("environment") != env:
+        raise PipelineError(f"note {note.number} v{note.version} record lives in {rec.get('environment')!r}, not {env!r}")
     try:
         client = Client(env)
     except LookupError:
         print(token_instructions(note, env))
         return EXIT_BLOCKED
     dep = client.get(rec["deposition_id"])
+    if dep.get("state") == "inprogress":
+        raise PipelineError(f"deposition {dep['id']} is already open for editing (state inprogress); "
+                            "discard or publish that edit in the Zenodo UI first")
     live = dep["metadata"]
     diffs = metadata_diff(note, live)
     if not diffs:
@@ -267,13 +274,27 @@ def edit_metadata(note: Note, env: str = "production", apply: bool = False, conf
     new_meta = {k: v for k, v in live.items() if k != "prereserve_doi"}
     new_meta.update({k: v for k, v in build_metadata(note).items() if k in PIPELINE_OWNED})
     client._check(client.s.post(f"{client.base}/deposit/depositions/{dep['id']}/actions/edit", timeout=60), 200, 201)
-    client.update(dep["id"], new_meta)
-    client.publish(dep["id"])
+    try:
+        client.update(dep["id"], new_meta)
+        client.publish(dep["id"])
+    except PipelineError:
+        # never leave the record locked in the edit state with a half-applied change
+        client._check(client.s.post(f"{client.base}/deposit/depositions/{dep['id']}/actions/discard", timeout=60),
+                      200, 201)
+        raise
     after = client.get(dep["id"])["metadata"]
     remaining = metadata_diff(note, after)
     if remaining:
         raise PipelineError(f"after publishing, these fields still differ: {sorted(remaining)}")
-    print(f"Record {rec['deposition_id']} metadata updated and republished; DOI {rec.get('doi')} unchanged.")
+    rec = dict(rec)
+    rec.setdefault("metadata_edits", []).append({
+        "date": utc_now(), "fields": sorted(diffs), "confirmed_doi": confirm_doi,
+        "via": f"publish.py zenodo-edit-metadata (GitHub Actions run {os.environ['GITHUB_RUN_ID']})"
+        if os.environ.get("GITHUB_RUN_ID") else "publish.py zenodo-edit-metadata (local)",
+    })
+    save_record(note, rec)
+    print(f"Record {rec['deposition_id']} metadata updated and republished; DOI {rec.get('doi')} unchanged; "
+          f"edit recorded in {note.zenodo_path.name}.")
     return 0
 
 
@@ -377,6 +398,10 @@ def run(note: Note, env: str = "production", publish: bool = False, confirm_doi:
         return EXIT_BLOCKED
 
     record = note.zenodo_record()
+    if record and record.get("environment") != env:
+        raise PipelineError(f"v{note.version} already has a {record.get('environment')} record "
+                            f"({record.get('doi') or record.get('reserved_doi')}); refusing to create a {env} one "
+                            "that would overwrite it in zenodo.json")
     dep = None
     if record and record.get("environment") == env and record.get("version") == note.version:
         dep = client.get(record["deposition_id"])

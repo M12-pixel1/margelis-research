@@ -5,9 +5,19 @@ import json
 import re
 from pathlib import Path
 
+import hashlib
+
+import jsonschema
+
 from .common import PipelineError, git, load_json, sha256_file
 
 EXPECTED_BENCHMARK = "Verified Delegation Benchmark v0.2"
+
+
+def _evidence_digest(item) -> str:
+    """Same canonical form as the live runners: sorted keys, compact separators, ASCII-escaped."""
+    raw = json.dumps(item, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return "sha256:" + hashlib.sha256(raw).hexdigest()
 PUBLISHED_STATUS = "PUBLISHED_RESULT"
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
@@ -33,6 +43,8 @@ def _load_json(path: Path, problems: list[str], label: str):
 def _validate_bundle(root: Path, bundle: Path) -> list[str]:
     problems: list[str] = []
     label = bundle.name
+    receipt_validator = jsonschema.Draft202012Validator(load_json(root / "schemas" / "receipt.schema.json"),
+                                                        format_checker=jsonschema.FormatChecker())
 
     if not bundle.is_dir():
         return [f"{label}: result entry must be a directory"]
@@ -146,20 +158,33 @@ def _validate_bundle(root: Path, bundle: Path) -> list[str]:
             problems.append(f"{label}: duplicate run_id {run_id}")
         run_ids.add(run_id)
 
+        # the commit each run actually executed and how it was triggered are mandatory provenance
         head = run.get("head_sha")
-        if head is not None:
-            # the commit each run actually executed must be recorded and must carry the same runner
-            if not isinstance(head, str) or not HEX40.fullmatch(head):
-                problems.append(f"{label}: run {run_id} head_sha must be a 40-hex commit SHA")
-            elif runner_path and isinstance(runner_blob_sha, str):
+        if not isinstance(head, str) or not HEX40.fullmatch(head):
+            problems.append(f"{label}: run {run_id} head_sha must be a 40-hex commit SHA (required)")
+        elif runner_path and isinstance(runner_blob_sha, str):
+            try:
+                git("cat-file", "-e", f"{head}^{{commit}}")
+            except PipelineError:
+                problems.append(f"{label}: run {run_id} head commit {head[:7]} is not fetchable "
+                                f"(push a tag such as vdb-run-{run_id} pointing at it)")
+            else:
                 try:
-                    if git("rev-parse", f"{head}:{runner_path}") != runner_blob_sha:
-                        problems.append(f"{label}: run {run_id} executed a different runner than source.runner_blob_sha")
+                    blob_at_head = git("rev-parse", f"{head}:{runner_path}")
                 except PipelineError:
-                    problems.append(f"{label}: run {run_id} head commit {head[:7]} is not fetchable "
-                                    f"(push a tag such as vdb-run-{run_id} pointing at it)")
-            if run.get("event") not in {"push", "workflow_dispatch", "schedule", "pull_request"}:
-                problems.append(f"{label}: run {run_id} event must record how the run was triggered")
+                    problems.append(f"{label}: run {run_id} head commit {head[:7]} does not contain {runner_path}")
+                else:
+                    if blob_at_head != runner_blob_sha:
+                        problems.append(f"{label}: run {run_id} executed a different runner "
+                                        f"({blob_at_head[:7]}) than source.runner_blob_sha")
+                wf_at_run = _safe_repo_path(run.get("workflow_path_at_run"))
+                if run.get("workflow_path_at_run") is not None:
+                    try:
+                        git("cat-file", "-e", f"{head}:{wf_at_run}")
+                    except PipelineError:
+                        problems.append(f"{label}: run {run_id} workflow_path_at_run not found at head commit")
+        if run.get("event") not in {"push", "workflow_dispatch", "schedule", "pull_request"}:
+            problems.append(f"{label}: run {run_id} event must record how the run was triggered")
 
         raw_digest = run.get("raw_evidence_json_sha256")
         if not isinstance(raw_digest, str) or not HEX64.fullmatch(raw_digest):
@@ -199,6 +224,20 @@ def _validate_bundle(root: Path, bundle: Path) -> list[str]:
         for row in rows:
             if isinstance(row, dict) and isinstance(row.get("scenario"), str) and isinstance(row.get("system"), str):
                 by_key[(row["scenario"], row["system"])] = row
+        for (scenario, system), row in sorted(by_key.items()):
+            receipt = row.get("receipt")
+            if not isinstance(receipt, dict):
+                problems.append(f"{label}: run {run_id} {scenario}/{system} has no receipt")
+                continue
+            errors = sorted(receipt_validator.iter_errors(receipt), key=lambda e: list(e.absolute_path))
+            if errors:
+                where = "/".join(map(str, errors[0].absolute_path)) or "<root>"
+                problems.append(f"{label}: run {run_id} {scenario}/{system} receipt violates receipt.schema.json "
+                                f"({len(errors)} error(s); first: {where}: {errors[0].message[:80]})")
+            recomputed = [_evidence_digest(item) for item in row.get("evidence", [])]
+            if receipt.get("evidence_hashes") != recomputed:
+                problems.append(f"{label}: run {run_id} {scenario}/{system} receipt.evidence_hashes do not match "
+                                f"the recorded evidence items")
         for scenario, expected_row in matrix_by_scenario.items():
             for system in ("unsafe", "guarded"):
                 row = by_key.get((scenario, system))

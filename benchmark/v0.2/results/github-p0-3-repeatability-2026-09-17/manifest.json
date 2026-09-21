@@ -123,10 +123,18 @@
   "limitations": [
     "The systems under test are benchmark-defined unsafe and guarded reference behaviors, not a commercial autonomous-agent product.",
     "The external system of record is GitHub Issues; this does not establish generalization to payments, CRM, deployment, or other providers.",
-    "The candidate contains two independent live runs only.",
-    "No customer, production, or personal operational data is used."
+    "The bundle contains two repeated runs started by the same operator from this repository (push-triggered); no independent third-party rerun is included.",
+    "No customer, production, or personal operational data is used.",
+    "In the expired_mandate rows the mandate window, authorization_time and execution_time in the receipt are synthetic values offset from the run start (T0 = start - 20 min); the readback timestamps are the real GitHub timestamps."
   ],
   "result_id": "github-p0-3-repeatability-2026-09-17",
   "published_on": "2026-09-17",
-  "provenance_note": "Both runs were triggered by push events to feature branches of this repository, not by the manual workflow_dispatch gate that .github/workflows/benchmark-live-github.yml has on main. The runner blob is identical at both run head commits and at source.main_commit, so the executed code is exactly the one recorded; the trigger differed. Run head commits are tagged vdb-run-<run_id> so they stay fetchable. Fields added 2026-09-21."
+  "provenance_note": "Both runs were triggered by push events to feature branches of this repository, not by the manual workflow_dispatch gate that .github/workflows/benchmark-live-github.yml has on main. The runner blob is identical at both run head commits and at source.main_commit, so the executed code is exactly the one recorded; the trigger differed. Run head commits are tagged vdb-run-<run_id> so they stay fetchable. Fields added 2026-09-21.",
+  "publication_decision": {
+    "pull_request": 22,
+    "merge_commit": "7e4b77447c754f4e83ca8715ee3d70c07d334c30",
+    "merged_by": "M12-pixel1",
+    "merged_at": "2026-09-17T17:16:47Z",
+    "note": "The merge of the pull request into the protected main branch is the record of the publication decision."
+  }
 }
