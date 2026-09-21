@@ -1,6 +1,6 @@
 {
   "receipt_type": "margelis-research/publication-receipt/1",
-  "generated_at": "2026-09-17T07:18:50Z",
+  "generated_at": "2026-09-21T11:05:47Z",
   "generated_by": "python tools/publish.py receipt 001",
   "note": "001",
   "version": "1.1",
@@ -66,13 +66,13 @@
     "status": "LIVE",
     "page": {
       "url": "https://rupestelisholding.com/research/001/",
-      "checked_at": "2026-09-17T07:18:48Z",
+      "checked_at": "2026-09-21T11:05:45Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://rupestelisholding.com/research/001/v1.1/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T07:18:49Z",
+      "checked_at": "2026-09-21T11:05:46Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
@@ -89,18 +89,18 @@
     "pages_site": "https://m12-pixel1.github.io/margelis-research/",
     "pages_status": null,
     "pages_error": null,
-    "deployment_id": 6496998775,
-    "deployment_commit": "93b9f12afd4c519dd40d106340af887ea060a538",
+    "deployment_id": 6566931764,
+    "deployment_commit": "ac67dc1b11f1f5855b65f1461c0bf3b1bb38af30",
     "deployment_state": "success",
     "page": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/",
-      "checked_at": "2026-09-17T07:18:47Z",
+      "checked_at": "2026-09-21T11:05:43Z",
       "http_status": 200,
       "content_type": "text/html; charset=utf-8"
     },
     "pdf": {
       "url": "https://m12-pixel1.github.io/margelis-research/research/001/v1.1/Margelis_Research_Note_001.pdf",
-      "checked_at": "2026-09-17T07:18:47Z",
+      "checked_at": "2026-09-21T11:05:44Z",
       "http_status": 200,
       "content_type": "application/pdf",
       "sha256": "e57c225251f57c078b5f42bcf36f8963e630862c447941706b3ffd325fcb1a58",
@@ -124,7 +124,8 @@
     "public_api_status": 200,
     "record_url": "https://zenodo.org/records/22806682",
     "files_match": true,
-    "concept_doi": "10.5281/zenodo.22806277"
+    "concept_doi": "10.5281/zenodo.22806277",
+    "metadata_matches": true
   },
   "doi": "10.5281/zenodo.22806682",
   "concept_doi": "10.5281/zenodo.22806277",
@@ -144,7 +145,7 @@
   },
   "validation": {
     "summary": {
-      "PASS": 30,
+      "PASS": 35,
       "FAIL": 0,
       "WARN": 0,
       "SKIP": 0
@@ -258,7 +259,7 @@
       {
         "id": "note001.published_claims",
         "status": "PASS",
-        "detail": "no novelty/marketing language in 23 published files"
+        "detail": "no novelty/marketing language in 29 published files"
       },
       {
         "id": "note001.name_spelling",
@@ -281,9 +282,19 @@
         "detail": "2 synthetic examples valid; 4 invalid mutations rejected"
       },
       {
-        "id": "benchmark.no_results_published",
+        "id": "benchmark.result_bundle_validator_selftest",
         "status": "PASS",
-        "detail": "results/ contains only README.md"
+        "detail": "complete bundle accepted (1 published result bundle(s) validated with durable evidence and provenance); tampered evidence rejected; scenario hash drift rejected; missing evidence rejected; unready bundle rejected"
+      },
+      {
+        "id": "benchmark.result_bundles",
+        "status": "PASS",
+        "detail": "1 published result bundle(s) validated with durable evidence and provenance"
+      },
+      {
+        "id": "benchmark.docs_consistency",
+        "status": "PASS",
+        "detail": "documents agree: 1 published bundle(s), all listed in results/README.md"
       },
       {
         "id": "repo.license_display_contract",
@@ -291,14 +302,29 @@
         "detail": "granted/pending render+parse round-trips pass; cross-state and missing-row cases rejected"
       },
       {
+        "id": "repo.docs_current",
+        "status": "PASS",
+        "detail": "README files describe the current version of 1 note(s)"
+      },
+      {
+        "id": "repo.dependency_lock",
+        "status": "PASS",
+        "detail": "19 packages hash-pinned; direct pins match requirements.txt"
+      },
+      {
+        "id": "repo.workflow_pins",
+        "status": "PASS",
+        "detail": "16 action references pinned to full commit SHAs"
+      },
+      {
         "id": "repo.internal_links",
         "status": "PASS",
-        "detail": "63 relative links resolve (site pages and repository docs)"
+        "detail": "72 relative links resolve (site pages and repository docs)"
       },
       {
         "id": "repo.secret_scan",
         "status": "PASS",
-        "detail": "78 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
+        "detail": "117 publishable files scanned; no credentials, private paths, internal hosts, IP addresses, e-mail addresses or phone numbers"
       }
     ]
   },
