@@ -1,0 +1,175 @@
+{
+  "schema": "margelis.native-os.working-paper.reproduction/0.1",
+  "date": "2026-10-29",
+  "source_repository": "https://github.com/M12-pixel1/margelis-research",
+  "source_commit": "d6f532dfcfa28df7828dfec6db63a0f752d3567b",
+  "operator": "AI-assisted reproduction in a separate task workspace; not an independent institutional replication",
+  "python": "3.12.14",
+  "dependencies": {
+    "PyYAML": "6.0.3",
+    "jsonschema": "4.26.0",
+    "referencing": "0.37.0",
+    "jsonschema-specifications": "2025.9.1",
+    "rpds-py": "2026.9.1",
+    "attrs": "26.1.0"
+  },
+  "source_files": [
+    {
+      "path": "benchmark/v0.2/harness/README.md",
+      "sha256": "22678be439b6835c7f97d25ae0b52191aa6b4478ff0c8b0397311dd0c14aa186"
+    },
+    {
+      "path": "benchmark/v0.2/harness/runner.py",
+      "sha256": "c340a24d1a53a3e54950418c6546d21987fa674d38e5fad2e6a55d8ef257e9b3"
+    },
+    {
+      "path": "benchmark/v0.2/harness/systems.py",
+      "sha256": "332126b36eab6242792eded7bc782ee81a0685282281c63e2b50b5ded13ae545"
+    },
+    {
+      "path": "benchmark/v0.2/sandbox/README.md",
+      "sha256": "7ecf5eb69c3ea898bf6f79badd4c9dd243fe7fdf2408e7ddf6f2c8dbc1121f82"
+    },
+    {
+      "path": "benchmark/v0.2/sandbox/authoritative_server.py",
+      "sha256": "f3ab27c1826c422244e90bd9390488253baf20f8c486f0bbf123313fed1b476a"
+    },
+    {
+      "path": "benchmark/v0.2/sandbox/runner.py",
+      "sha256": "671189e6e6d986317c8002ccba955906659c32e44387dbcab7f8cc5dde9933f3"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/credential_drift.yaml",
+      "sha256": "ef6164e561136b6c1a5e2c4fa470965f24fabf85c6e5c6604a305c7acfa1f7ae"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/expired_mandate.yaml",
+      "sha256": "300820a3d2feaf2aa34ab4354b88bc582c526dd771bd7dd4b1fe1e8f657d7a91"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/false_done.yaml",
+      "sha256": "f9d0c95720349a750f23a4e14ff7e6cd482eaeb7279f59387fd2133601f92ab2"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/indirect_execution.yaml",
+      "sha256": "717fb0643dc469978b0d62892fc0854967294026635f65e48889e50f4e0e1a34"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/memory_as_authority.yaml",
+      "sha256": "8709f11538855fabf51a73e6488c41d954f80950709b8e9599dc78f908e672c6"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/model_swap.yaml",
+      "sha256": "f26792a02d2c5db80084578003955ee12d8d64cdc979749dbed3ed9a06e3d720"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/partial_external_success.yaml",
+      "sha256": "bc8e7bca145b2ea5ccdd535ae7e20a2d2f433c1c566ecf061abd983eb1255b71"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/policy_drift.yaml",
+      "sha256": "3c28fff45bbfed8a3af25d290b2d7eb604d6081204378fe94dee4157fa33aba9"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/replay.yaml",
+      "sha256": "e3aa93b4f52618117805d0873ba2ca4010fd2f604f0cfcc2b18af7aee0a806e8"
+    },
+    {
+      "path": "benchmark/v0.2/scenarios/subagent_scope_expansion.yaml",
+      "sha256": "6e906c4701e1a35cd6848ee4c690e6678893f8273d8bcb0f9502b1e4f8980ef9"
+    },
+    {
+      "path": "benchmark/v0.2/schemas/examples/README.md",
+      "sha256": "0040d8f425f92399b79ae7b6026e56f37837b997a6d82bf6d4f42298c31f3390"
+    },
+    {
+      "path": "benchmark/v0.2/schemas/examples/receipt.synthetic-example.denied.json",
+      "sha256": "6f78b46f816ce2856bea985f506dfd09bf44ed1ce7c4aa82c3bd993318e91da8"
+    },
+    {
+      "path": "benchmark/v0.2/schemas/examples/receipt.synthetic-example.unverified.json",
+      "sha256": "b999ec0973b35c71be94cec23dfeaac31fa8f3944a5352aec5ec140400ab4278"
+    },
+    {
+      "path": "benchmark/v0.2/schemas/receipt.schema.json",
+      "sha256": "76495f249e9133af5dfbfaa4f9437f7c23b99322301e522feab8fe62d6629937"
+    },
+    {
+      "path": "benchmark/v0.2/schemas/scenario.schema.json",
+      "sha256": "f71caaa38459f57968de804b7840bbe4a11ab6244b19c4b8d10fc49ad4a63bca"
+    }
+  ],
+  "runs": [
+    {
+      "file": "harness-run-01.json",
+      "stage": "harness",
+      "returncode": 0,
+      "result_status": "HARNESS_SELF_TEST_ONLY",
+      "systems": {
+        "guarded-reference": {
+          "pass": 3,
+          "cases": 3
+        },
+        "unsafe-baseline": {
+          "pass": 0,
+          "cases": 3
+        }
+      }
+    },
+    {
+      "file": "harness-run-02.json",
+      "stage": "harness",
+      "returncode": 0,
+      "result_status": "HARNESS_SELF_TEST_ONLY",
+      "systems": {
+        "guarded-reference": {
+          "pass": 3,
+          "cases": 3
+        },
+        "unsafe-baseline": {
+          "pass": 0,
+          "cases": 3
+        }
+      }
+    },
+    {
+      "file": "sandbox-run-01.json",
+      "stage": "sandbox",
+      "returncode": 0,
+      "result_status": "PROCESS_SANDBOX_SELF_TEST_ONLY",
+      "systems": {
+        "guarded-remote": {
+          "pass": 3,
+          "cases": 3
+        },
+        "unsafe-remote": {
+          "pass": 0,
+          "cases": 3
+        }
+      }
+    },
+    {
+      "file": "sandbox-run-02.json",
+      "stage": "sandbox",
+      "returncode": 0,
+      "result_status": "PROCESS_SANDBOX_SELF_TEST_ONLY",
+      "systems": {
+        "guarded-remote": {
+          "pass": 3,
+          "cases": 3
+        },
+        "unsafe-remote": {
+          "pass": 0,
+          "cases": 3
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Three scenario types, not statistical samples.",
+    "Two deterministic repeats do not measure generalization or reliability.",
+    "Both systems are publisher-defined reference behaviours, not deployed Native OS or third-party agents.",
+    "Sandbox state is synthetic and process-local; no bank, booking, telephone or customer system was used.",
+    "The reproduction does not test semantic memory or live authorization integration."
+  ]
+}

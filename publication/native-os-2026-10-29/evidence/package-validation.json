@@ -1,0 +1,30 @@
+{
+  "schema": "margelis.working-paper.package-validation/0.1",
+  "date": "2026-10-29",
+  "scope": "Working-paper artifacts only, not Native OS production validation",
+  "pdf": {
+    "pages": 5,
+    "visual_review": "Five rendered pages inspected; short tables kept together; no clipping or overlap observed",
+    "same_environment_rebuild_identical": true,
+    "sha256": "42b0e7cc0aacb9179371f63bd0cbd5755a9967e06e8cb3f1a0b160b815a7bcf5",
+    "renderer_dependencies": {
+      "reportlab": "4.5.0",
+      "markdown-it-py": "4.0.0",
+      "pypdf": "6.10.2",
+      "Pillow": "11.3.0"
+    }
+  },
+  "checks": {
+    "new_markdown_supported_syntax": "PASS",
+    "new_markdown_relative_links": "PASS",
+    "source_snapshot_git_blob_identity": "PASS",
+    "new_package_secret_and_private_data_pattern_scan": "PASS",
+    "semantic_fixture_structure_30_distinct_ids_6_groups": "PASS"
+  },
+  "not_claimed": [
+    "Full repository CI has not yet run on the proposed commit.",
+    "Not an independent security review.",
+    "No semantic-memory trial was run.",
+    "No Native OS or live-service integration was tested."
+  ]
+}
